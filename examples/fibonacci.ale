@@ -1,0 +1,21 @@
+// Fibonacci sequence in alescript
+
+recipe fibonacci(n) {
+    brew a from water, barley.
+    wait for 1 day.
+    brew b from water, barley.
+    brew temp from water.
+
+    if n is 0:
+        b
+    else:
+        repeat n times:
+            relabel temp as a.
+            mix a with b.
+            relabel b as a.
+            relabel a as temp.
+
+        b
+}
+
+toast fibonacci(10).
