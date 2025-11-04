@@ -1,0 +1,136 @@
+// alescript BNF Grammar
+// Lines end with '.' and blocks use ':' with indentation
+
+<program> ::= <statement_list>
+
+<statement_list> ::= <statement> | <statement> <statement_list>
+
+<statement> ::= <brew_decl>
+              | <wait_stmt>
+              | <taste_stmt>
+              | <toast_stmt>
+              | <age_stmt>
+              | <mix_stmt>
+              | <double_stmt>
+              | <dilute_stmt>
+              | <conditional>
+              | <loop>
+              | <keg_stmt>
+              | <barrel_decl>
+              | <barrel_add>
+              | <barrel_remove>
+              | <recipe_decl>
+              | <recipe_call>
+              | <relabel_stmt>
+              | <comment>
+
+// Variable declarations
+<brew_decl> ::= "brew" <identifier> "from" <ingredient_list> "."
+
+<ingredient_list> ::= <ingredient>
+                    | <ingredient> "," <ingredient_list>
+
+<ingredient> ::= <ingredient_name>
+               | <number> <ingredient_name>
+
+<ingredient_name> ::= "water" | "barley" | "hops" | "yeast"
+
+// Time control
+<wait_stmt> ::= "wait" "for" <number> "days" "."
+              | "wait" "for" <number> "day" "."
+
+<age_stmt> ::= "age" <identifier> "until" "is" <percentage> "abv" "."
+
+// Output
+<taste_stmt> ::= "taste" <identifier> "."
+
+<toast_stmt> ::= "toast" <expression> "."
+
+// Arithmetic operations
+<mix_stmt> ::= "mix" <identifier> "with" <identifier> "."
+
+<double_stmt> ::= "double" <identifier> "by" <number> "."
+
+<dilute_stmt> ::= "dilute" <identifier> "by" <number> "."
+
+// Conditionals
+<conditional> ::= <if_stmt> | <judge_stmt>
+
+<if_stmt> ::= "if" <comparison> ":" <block>
+            | "if" <comparison> ":" <block> "else" ":" <block>
+
+<judge_stmt> ::= "judge" "if" <comparison> ":" <block>
+               | "judge" "if" <comparison> ":" <block> "else" ":" <block>
+
+<comparison> ::= <identifier> "is" <percentage>
+               | <identifier> "is" "stronger" "than" <percentage>
+               | <identifier> "is" "weaker" "than" <percentage>
+               | <identifier> "is" "not" "weaker" "than" <percentage>
+               | <identifier> "is" "not" "stronger" "than" <percentage>
+               | <identifier> "is" <number>
+
+// Loops
+<loop> ::= "repeat" "until" <comparison> ":" <block>
+         | "repeat" <number> "times" ":" <block>
+         | "for" "each" <identifier> "in" <identifier> ":" <block>
+
+// Kegging
+<keg_stmt> ::= "keg" <identifier> "."
+
+// Barrels (arrays)
+<barrel_decl> ::= "barrel" <identifier> "=" "[" <barrel_contents> "]" "."
+
+<barrel_contents> ::= <empty>
+                    | <identifier_list>
+
+<identifier_list> ::= <identifier>
+                    | <identifier> "," <identifier_list>
+
+<barrel_add> ::= "add" <identifier> "to" <identifier> "."
+
+<barrel_remove> ::= "remove" <identifier> "from" <identifier> "."
+
+<barrel_access> ::= <identifier> "position" <number>
+
+// Recipes (functions)
+<recipe_decl> ::= "recipe" <identifier> "(" <param_list> ")" "{" <block> "}"
+
+<param_list> ::= <empty>
+               | <identifier>
+               | <identifier> "," <param_list>
+
+<recipe_call> ::= <identifier> "(" <arg_list> ")"
+
+<arg_list> ::= <empty>
+             | <expression>
+             | <expression> "," <arg_list>
+
+// Relabeling (reassignment)
+<relabel_stmt> ::= "relabel" <identifier> "as" <identifier> "."
+
+// Blocks and expressions
+<block> ::= <statement> | <statement> <block>
+
+<expression> ::= <identifier>
+               | <number>
+               | <string>
+               | <percentage>
+               | <recipe_call>
+               | <barrel_access>
+
+// Primitives
+<identifier> ::= [a-zA-Z_][a-zA-Z0-9_]*
+
+<number> ::= [0-9]+ | [0-9]+ "." [0-9]+
+
+<percentage> ::= <number> "%"
+
+<string> ::= '"' <char_sequence> '"'
+
+<char_sequence> ::= <empty> | <char> <char_sequence>
+
+<char> ::= any character except '"'
+
+<comment> ::= "//" <any_chars_until_newline>
+
+<empty> ::=
