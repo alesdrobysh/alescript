@@ -2,36 +2,35 @@ mod token;
 mod lexer;
 
 use lexer::Lexer;
+use std::env;
+use std::fs;
+use std::process;
 
 fn main() {
-    let source = r#"
-// Example alescript program
-brew lager from water, 1 barley, 2 hops, 1 yeast.
+    let args: Vec<String> = env::args().collect();
 
-wait for 5 days.
+    if args.len() != 2 {
+        eprintln!("Usage: {} <file.ales>", args[0]);
+        eprintln!("\nExample:");
+        eprintln!("  {} examples/hello.ales", args[0]);
+        process::exit(1);
+    }
 
-taste lager.
+    let file_path = &args[1];
 
-toast "hello, world!".
+    // Read the source file
+    let source = match fs::read_to_string(file_path) {
+        Ok(content) => content,
+        Err(err) => {
+            eprintln!("Error reading file '{}': {}", file_path, err);
+            process::exit(1);
+        }
+    };
 
-if lager is stronger than 5.0%:
-    toast "strong brew!"
-else:
-    toast "mild brew."
-
-recipe fibonacci(n) {
-    brew a from water, barley.
-    wait for 1 day.
-    b
-}
-"#;
-
-    println!("Tokenizing alescript source:\n{}", source);
-    println!("\n{:-<60}", "");
-    println!("Tokens:");
+    println!("Tokenizing: {}", file_path);
     println!("{:-<60}\n", "");
 
-    let lexer = Lexer::new(source);
+    let lexer = Lexer::new(&source);
 
     for token in lexer {
         println!("{}", token);
