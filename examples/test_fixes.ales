@@ -1,0 +1,16 @@
+// Test the three runtime improvements
+
+// Test 1: age_until with already-reached target
+brew test1 from water, barley.
+wait for 10 days.
+taste test1.
+age test1 until 5%.
+toast "Test 1 passed".
+
+// Test 3: Verify double semantics
+brew test3 from water, barley.
+wait for 5 days.
+taste test3.
+double test3 by 3.
+toast "After doubling by 3".
+taste test3.

@@ -73,11 +73,20 @@ impl RuntimeEnvironment {
     }
 
     /// Advance the global timeline and update all brews
-    pub fn advance_time(&mut self, days: f64) {
+    /// Returns an error if days is negative (time cannot go backward)
+    pub fn advance_time(&mut self, days: f64) -> Result<(), String> {
+        if days < 0.0 {
+            return Err(format!(
+                "Cannot advance time by negative amount: {} days",
+                days
+            ));
+        }
+
         self.global_time += days;
         for brew in self.brews.values_mut() {
             brew.update_to_time(self.global_time);
         }
+        Ok(())
     }
 
     /// Create a new brew with given growth rate
@@ -108,12 +117,18 @@ impl RuntimeEnvironment {
     }
 
     /// Age a brew until it reaches target ABV
+    /// If the brew is already at or above the target, this is a no-op.
     pub fn age_until(&mut self, name: &str, target_abv: f64) -> Result<(), String> {
         if let Some(brew) = self.brews.get_mut(name) {
             brew.update_to_time(self.global_time);
 
             if brew.is_kegged {
                 return Err(format!("Cannot age kegged brew '{}'", name));
+            }
+
+            // If already at or above target, nothing to do
+            if brew.current_abv >= target_abv {
+                return Ok(());
             }
 
             if brew.growth_rate <= 0.0 {
@@ -125,15 +140,9 @@ impl RuntimeEnvironment {
 
             // Calculate time needed
             let time_needed = (target_abv - brew.current_abv) / brew.growth_rate;
-            if time_needed < 0.0 {
-                return Err(format!(
-                    "Brew '{}' is already at {}% ABV, cannot age to lower value {}%",
-                    name, brew.current_abv, target_abv
-                ));
-            }
 
             // Advance time for all brews
-            self.advance_time(time_needed);
+            self.advance_time(time_needed)?;
             Ok(())
         } else {
             Err(format!("Brew '{}' not found", name))
@@ -154,7 +163,10 @@ impl RuntimeEnvironment {
         }
     }
 
-    /// Double a brew's ABV by a factor (advances time)
+    /// Multiply a brew's ABV by a factor (advances time)
+    /// Note: In alescript, "double by N" means multiply by N, not multiply by 2.
+    /// For example, "double porter by 3" multiplies the ABV by 3.
+    /// This operation advances time based on the brew's growth rate.
     pub fn double_brew(&mut self, name: &str, factor: f64) -> Result<(), String> {
         let current_abv = self.get_brew_abv(name)?;
 
@@ -169,7 +181,7 @@ impl RuntimeEnvironment {
 
             // Advance time
             if time_needed > 0.0 {
-                self.advance_time(time_needed);
+                self.advance_time(time_needed)?;
             } else {
                 // Just set the value directly
                 brew.current_abv = target_abv;

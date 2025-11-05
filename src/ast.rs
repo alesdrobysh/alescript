@@ -37,6 +37,7 @@ pub enum Statement {
     },
 
     // Double statement: double porter by 3.
+    // Note: "double by N" means multiply ABV by N (not necessarily by 2)
     Double {
         brew_name: String,
         factor: Expression,

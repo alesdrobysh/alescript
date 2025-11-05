@@ -51,7 +51,9 @@ impl Interpreter {
                 let days_num = days_value
                     .as_number()
                     .map_err(|e| RuntimeError::new(e))?;
-                self.runtime.advance_time(days_num);
+                self.runtime
+                    .advance_time(days_num)
+                    .map_err(|e| RuntimeError::new(e))?;
                 Ok(Value::Void)
             }
 
