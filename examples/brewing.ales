@@ -7,29 +7,34 @@ brew lager from water, 1 barley, 2 hops, 1 yeast.
 brew stout from water, 2 barley, 1 hops, 1 yeast.
 
 // Wait for fermentation
-wait for 5 days.
+wait for 2 days.
 
 // Check the results
 taste lager.
 taste stout.
 
 // Age the lager to perfection
-age lager until is 5.2% abv.
+age lager until 10%.
 
 // Keg it to stop growth
 keg lager.
+
+// Wait more - lager should stay at 10%, stout will continue growing
+wait for 2 days.
 
 // Mix brews together
 mix lager with stout.
 
 // Judge the strength
 judge if lager is stronger than 5.0%:
-    toast "strong brew!"
+    toast "strong brew!".
 else:
-    toast "mild brew."
+    toast "mild brew.".
+end.
 
 // Create a barrel of brews
 barrel taplist = [lager, stout].
 
-for each brew in taplist:
-    taste brew.
+repeat each beer in taplist:
+    taste beer.
+end.
