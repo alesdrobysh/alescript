@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alescript Playground</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 15px 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            color: white;
+        }
+
+        .controls label {
+            font-weight: 600;
+        }
+
+        .controls select {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            background: white;
+            color: #333;
+            font-size: 14px;
+            cursor: pointer;
+            flex: 1;
+            max-width: 300px;
+        }
+
+        .controls button {
+            padding: 10px 30px;
+            border: none;
+            border-radius: 5px;
+            background: #48bb78;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .controls button:hover {
+            background: #38a169;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .controls button:active {
+            transform: translateY(0);
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+            gap: 20px;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        textarea {
+            flex: 1;
+            padding: 20px;
+            border: none;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            resize: none;
+            outline: none;
+        }
+
+        #output {
+            flex: 1;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            background: #f7fafc;
+        }
+
+        .loading {
+            color: #667eea;
+            font-style: italic;
+        }
+
+        .error {
+            color: #f56565;
+            font-weight: 600;
+        }
+
+        .success {
+            color: #48bb78;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🍺 Alescript Playground</h1>
+        <p class="subtitle">A brewing-themed programming language</p>
+    </header>
+
+    <div class="controls">
+        <label for="examples">Examples:</label>
+        <select id="examples">
+            <option value="">-- Select an example --</option>
+            <option value="hello">Hello World</option>
+            <option value="fibonacci">Fibonacci Sequence</option>
+            <option value="brewing">Brewing Demo</option>
+        </select>
+        <button id="runButton">▶ Run</button>
+    </div>
+
+    <div class="container">
+        <div class="panel">
+            <div class="panel-header">📝 Code</div>
+            <textarea id="code" placeholder="Enter your alescript code here...">// Hello World in alescript
+toast "hello, world!".</textarea>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">📤 Output</div>
+            <div id="output">Click "Run" to execute your code...</div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Examples database
+        const examples = {
+            hello: `// Hello World in alescript
+toast "hello, world!".`,
+
+            fibonacci: `// Fibonacci sequence in alescript
+
+recipe fibonacci(n)
+    brew a from water.
+    brew b from water, barley.
+    wait for 1 day.
+    brew temp from water.
+
+    repeat n times:
+        relabel a as temp.
+        mix a with b.
+        relabel temp as b.
+    end.
+
+    a
+end.
+
+toast fibonacci(10).`,
+
+            brewing: `// Example brewing program
+
+// Create a lager with specific ingredients
+brew lager from water, 1 barley, 2 hops, 1 yeast.
+
+// Create a stout with different ingredients
+brew stout from water, 2 barley, 1 hops, 1 yeast.
+
+// Wait for fermentation
+wait for 2 days.
+
+// Check the results
+taste lager.
+taste stout.
+
+// Age the lager to perfection
+age lager until 10%.
+
+// Keg it to stop growth
+keg lager.
+
+// Wait more - lager should stay at 10%, stout will continue growing
+wait for 2 days.
+
+// Mix brews together
+mix lager with stout.
+
+// Judge the strength
+judge if lager is stronger than 5.0%:
+    toast "strong brew!".
+else:
+    toast "mild brew.".
+end.
+
+// Create a barrel of brews
+barrel taplist = [lager, stout].
+
+repeat each beer in taplist:
+    taste beer.
+end.`
+        };
+
+        // Load WebAssembly module
+        let wasmModule = null;
+
+        async function initWasm() {
+            try {
+                const { default: init, run_alescript } = await import('./pkg/alescript.js');
+                await init();
+                wasmModule = { run_alescript };
+                document.getElementById('output').textContent = '✓ Ready! Enter your code and click Run.';
+                document.getElementById('output').className = 'success';
+            } catch (error) {
+                document.getElementById('output').innerHTML = `<span class="error">Error loading WebAssembly module:\n${error.message}\n\nMake sure to build the project first with:\nwasm-pack build --target web --out-dir web/pkg</span>`;
+            }
+        }
+
+        // Run code
+        function runCode() {
+            if (!wasmModule) {
+                document.getElementById('output').innerHTML = '<span class="error">WebAssembly module not loaded yet. Please wait...</span>';
+                return;
+            }
+
+            const code = document.getElementById('code').value;
+            const outputDiv = document.getElementById('output');
+
+            outputDiv.innerHTML = '<span class="loading">Running...</span>';
+
+            // Use setTimeout to allow UI to update
+            setTimeout(() => {
+                try {
+                    const result = wasmModule.run_alescript(code);
+                    outputDiv.textContent = result || '(no output)';
+                    outputDiv.className = '';
+                } catch (error) {
+                    outputDiv.innerHTML = `<span class="error">Error:\n${error.message}</span>`;
+                }
+            }, 10);
+        }
+
+        // Event listeners
+        document.getElementById('runButton').addEventListener('click', runCode);
+
+        document.getElementById('examples').addEventListener('change', (e) => {
+            const example = e.target.value;
+            if (example && examples[example]) {
+                document.getElementById('code').value = examples[example];
+            }
+        });
+
+        // Allow Ctrl+Enter to run code
+        document.getElementById('code').addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                runCode();
+            }
+        });
+
+        // Initialize
+        initWasm();
+    </script>
+</body>
+</html>

@@ -274,4 +274,53 @@ toast fibonacci(10). // "55% ABV"
 
 ---
 
+## Try it Online!
+
+**[Try alescript in your browser!](https://alesdrobysh.github.io/alescript/)**
+
+The alescript web playground lets you write and run alescript code directly in your browser:
+- 📝 Live code editor with syntax highlighting
+- ▶️ Instant execution with output display
+- 📚 Predefined examples (Hello World, Fibonacci, Brewing Demo)
+- ⌨️ Keyboard shortcut: Ctrl+Enter to run
+
+No installation needed—just start brewing code!
+
+---
+
+## Installation
+
+### Building from Source
+
+```bash
+# Clone the repository
+git clone https://github.com/alesdrobysh/alescript.git
+cd alescript
+
+# Build the project
+cargo build --release
+
+# Run a program
+cargo run --release examples/hello.ales
+```
+
+### WebAssembly / Web Playground
+
+To build and run the web playground locally:
+
+```bash
+# Install wasm-pack (if not already installed)
+curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+# Build the WebAssembly module
+wasm-pack build --target web --out-dir web/pkg
+
+# Serve the playground
+cd web
+python3 -m http.server 8080
+# Open http://localhost:8080 in your browser
+```
+
+---
+
 This is **just the beginning**. alescript isn't **just a language**; it's a **philosophy of brewing code with patience and mastery**. 🍻

@@ -7,6 +7,7 @@ pub struct Interpreter {
     runtime: RuntimeEnvironment,
     recipes: HashMap<String, (Vec<String>, Vec<Statement>, Option<Expression>)>,
     scopes: Vec<HashMap<String, Value>>, // Scope stack for local variables
+    output: String, // Output buffer for capturing print statements
 }
 
 #[derive(Debug)]
@@ -28,7 +29,17 @@ impl Interpreter {
             runtime: RuntimeEnvironment::new(),
             recipes: HashMap::new(),
             scopes: vec![HashMap::new()], // Start with global scope
+            output: String::new(),
         }
+    }
+
+    pub fn get_output(&self) -> String {
+        self.output.clone()
+    }
+
+    fn print(&mut self, text: String) {
+        self.output.push_str(&text);
+        self.output.push('\n');
     }
 
     pub fn execute(&mut self, program: &Program) -> RuntimeResult<()> {
@@ -82,23 +93,23 @@ impl Interpreter {
                     .runtime
                     .get_brew_abv(&actual_brew_name)
                     .map_err(|e| RuntimeError::new(e))?;
-                println!("{}% ABV", abv);
+                self.print(format!("{}% ABV", abv));
                 Ok(Value::Void)
             }
 
             Statement::Toast { value } => {
                 let result = self.evaluate_expression(value)?;
                 match result {
-                    Value::String(s) => println!("{}", s),
-                    Value::Number(n) => println!("{}% ABV", n),
+                    Value::String(s) => self.print(s),
+                    Value::Number(n) => self.print(format!("{}% ABV", n)),
                     Value::BrewRef(name) => {
                         let abv = self
                             .runtime
                             .get_brew_abv(&name)
                             .map_err(|e| RuntimeError::new(e))?;
-                        println!("{}% ABV", abv);
+                        self.print(format!("{}% ABV", abv));
                     }
-                    Value::Void => println!("void"),
+                    Value::Void => self.print("void".to_string()),
                 }
                 Ok(Value::Void)
             }
