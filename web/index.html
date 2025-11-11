@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alescript Playground</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/editor/editor.main.css">
     <style>
         * {
             margin: 0;
@@ -12,88 +13,105 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #1e1e1e;
             height: 100vh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            color: #d4d4d4;
         }
 
         header {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 20px;
-            text-align: center;
-            color: white;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background: #2d2d30;
+            border-bottom: 1px solid #3e3e42;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
 
         h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #cccccc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo {
+            font-size: 1.5rem;
         }
 
         .subtitle {
-            font-size: 1rem;
-            opacity: 0.9;
+            font-size: 0.85rem;
+            color: #858585;
         }
 
         .controls {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 15px 20px;
             display: flex;
-            gap: 15px;
+            gap: 12px;
             align-items: center;
-            color: white;
         }
 
         .controls label {
-            font-weight: 600;
+            font-size: 0.85rem;
+            color: #cccccc;
         }
 
         .controls select {
-            padding: 8px 12px;
-            border: none;
-            border-radius: 5px;
-            background: white;
-            color: #333;
-            font-size: 14px;
+            padding: 6px 10px;
+            border: 1px solid #3e3e42;
+            border-radius: 3px;
+            background: #3c3c3c;
+            color: #cccccc;
+            font-size: 13px;
             cursor: pointer;
-            flex: 1;
-            max-width: 300px;
+            min-width: 200px;
+            outline: none;
+        }
+
+        .controls select:hover {
+            background: #4e4e4e;
+        }
+
+        .controls select:focus {
+            border-color: #007acc;
         }
 
         .controls button {
-            padding: 10px 30px;
+            padding: 6px 16px;
             border: none;
-            border-radius: 5px;
-            background: #48bb78;
+            border-radius: 3px;
+            background: #0e639c;
             color: white;
-            font-size: 16px;
-            font-weight: 600;
+            font-size: 13px;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .controls button:hover {
-            background: #38a169;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            background: #1177bb;
         }
 
         .controls button:active {
-            transform: translateY(0);
+            background: #0d5a8f;
         }
 
         .container {
             display: flex;
             flex: 1;
-            gap: 20px;
-            padding: 20px;
             overflow: hidden;
         }
 
@@ -101,80 +119,106 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
+            border-right: 1px solid #3e3e42;
+        }
+
+        .panel:last-child {
+            border-right: none;
         }
 
         .panel-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px 20px;
-            font-size: 1.2rem;
-            font-weight: 600;
+            background: #2d2d30;
+            color: #cccccc;
+            padding: 8px 15px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-bottom: 1px solid #3e3e42;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        textarea {
+        #editor-container {
             flex: 1;
-            padding: 20px;
-            border: none;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            line-height: 1.6;
-            resize: none;
-            outline: none;
+            overflow: hidden;
         }
 
         #output {
             flex: 1;
-            padding: 20px;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
+            padding: 15px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
             line-height: 1.6;
             overflow-y: auto;
             white-space: pre-wrap;
             word-wrap: break-word;
-            background: #f7fafc;
+            background: #1e1e1e;
+            color: #d4d4d4;
+        }
+
+        #output::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        #output::-webkit-scrollbar-track {
+            background: #1e1e1e;
+        }
+
+        #output::-webkit-scrollbar-thumb {
+            background: #424242;
+            border-radius: 5px;
+        }
+
+        #output::-webkit-scrollbar-thumb:hover {
+            background: #4e4e4e;
         }
 
         .loading {
-            color: #667eea;
+            color: #4fc3f7;
             font-style: italic;
         }
 
         .error {
-            color: #f56565;
-            font-weight: 600;
+            color: #f48771;
         }
 
         .success {
-            color: #48bb78;
+            color: #89d185;
+        }
+
+        .status-bar {
+            background: #007acc;
+            color: white;
+            padding: 4px 15px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>🍺 Alescript Playground</h1>
-        <p class="subtitle">A brewing-themed programming language</p>
+        <div class="header-left">
+            <h1><span class="logo">🍺</span> Alescript Playground</h1>
+            <span class="subtitle">A brewing-themed programming language</span>
+        </div>
+        <div class="controls">
+            <label for="examples">Examples:</label>
+            <select id="examples">
+                <option value="">-- Select an example --</option>
+                <option value="hello">Hello World</option>
+                <option value="fibonacci">Fibonacci Sequence</option>
+                <option value="brewing">Brewing Demo</option>
+            </select>
+            <button id="runButton">▶ Run</button>
+        </div>
     </header>
-
-    <div class="controls">
-        <label for="examples">Examples:</label>
-        <select id="examples">
-            <option value="">-- Select an example --</option>
-            <option value="hello">Hello World</option>
-            <option value="fibonacci">Fibonacci Sequence</option>
-            <option value="brewing">Brewing Demo</option>
-        </select>
-        <button id="runButton">▶ Run</button>
-    </div>
 
     <div class="container">
         <div class="panel">
-            <div class="panel-header">📝 Code</div>
-            <textarea id="code" placeholder="Enter your alescript code here...">// Hello World in alescript
-toast "hello, world!".</textarea>
+            <div class="panel-header">📝 Code Editor</div>
+            <div id="editor-container"></div>
         </div>
 
         <div class="panel">
@@ -183,6 +227,11 @@ toast "hello, world!".</textarea>
         </div>
     </div>
 
+    <div class="status-bar">
+        <span id="status">⏳ Loading...</span>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
     <script type="module">
         // Examples database
         const examples = {
@@ -250,18 +299,135 @@ repeat each beer in taplist:
 end.`
         };
 
-        // Load WebAssembly module
+        // Monaco Editor instance
+        let editor = null;
         let wasmModule = null;
 
+        // Configure Monaco loader
+        require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs' } });
+
+        // Initialize Monaco Editor with Alescript language
+        require(['vs/editor/editor.main'], function() {
+            // Register Alescript language
+            monaco.languages.register({ id: 'alescript' });
+
+            // Define Monarch syntax highlighting for Alescript
+            monaco.languages.setMonarchTokensProvider('alescript', {
+                keywords: [
+                    'recipe', 'end', 'brew', 'from', 'wait', 'for', 'relabel', 'as',
+                    'mix', 'with', 'repeat', 'times', 'each', 'in', 'toast', 'taste',
+                    'age', 'until', 'keg', 'judge', 'if', 'is', 'than', 'else',
+                    'barrel', 'stronger', 'weaker', 'day', 'days', 'water', 'barley',
+                    'hops', 'yeast'
+                ],
+
+                operators: [
+                    '=', '>', '<', '+', '-', '*', '/'
+                ],
+
+                symbols: /[=><!~?:&|+\-*\/\^%]+/,
+
+                tokenizer: {
+                    root: [
+                        // Keywords
+                        [/[a-z_$][\w$]*/, {
+                            cases: {
+                                '@keywords': 'keyword',
+                                '@default': 'identifier'
+                            }
+                        }],
+
+                        // Whitespace
+                        { include: '@whitespace' },
+
+                        // Numbers
+                        [/\d*\.\d+([eE][\-+]?\d+)?/, 'number.float'],
+                        [/\d+/, 'number'],
+
+                        // Strings
+                        [/"([^"\\]|\\.)*$/, 'string.invalid'],
+                        [/"/, 'string', '@string'],
+
+                        // Delimiters and operators
+                        [/[{}()\[\]]/, '@brackets'],
+                        [/[<>](?!@symbols)/, '@brackets'],
+                        [/@symbols/, {
+                            cases: {
+                                '@operators': 'operator',
+                                '@default': ''
+                            }
+                        }],
+
+                        // Delimiter: .
+                        [/[;,.]/, 'delimiter'],
+                    ],
+
+                    whitespace: [
+                        [/[ \t\r\n]+/, 'white'],
+                        [/\/\/.*$/, 'comment'],
+                    ],
+
+                    string: [
+                        [/[^\\"]+/, 'string'],
+                        [/\\./, 'string.escape'],
+                        [/"/, 'string', '@pop']
+                    ],
+                }
+            });
+
+            // Define color theme for Alescript
+            monaco.editor.defineTheme('alescript-dark', {
+                base: 'vs-dark',
+                inherit: true,
+                rules: [
+                    { token: 'keyword', foreground: 'C586C0', fontStyle: 'bold' },
+                    { token: 'identifier', foreground: '9CDCFE' },
+                    { token: 'number', foreground: 'B5CEA8' },
+                    { token: 'string', foreground: 'CE9178' },
+                    { token: 'comment', foreground: '6A9955', fontStyle: 'italic' },
+                    { token: 'operator', foreground: 'D4D4D4' },
+                ],
+                colors: {
+                    'editor.background': '#1e1e1e',
+                }
+            });
+
+            // Create Monaco Editor
+            editor = monaco.editor.create(document.getElementById('editor-container'), {
+                value: examples.hello,
+                language: 'alescript',
+                theme: 'alescript-dark',
+                automaticLayout: true,
+                fontSize: 14,
+                minimap: { enabled: true },
+                scrollBeyondLastLine: false,
+                lineNumbers: 'on',
+                renderWhitespace: 'selection',
+                tabSize: 4,
+                insertSpaces: true,
+            });
+
+            // Add keyboard shortcut for running code (Ctrl+Enter or Cmd+Enter)
+            editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, runCode);
+
+            // Update status
+            document.getElementById('status').innerHTML = '✓ Monaco Editor loaded';
+
+            // Initialize WebAssembly
+            initWasm();
+        });
+
+        // Load WebAssembly module
         async function initWasm() {
             try {
                 const { default: init, run_alescript } = await import('./pkg/alescript.js');
                 await init();
                 wasmModule = { run_alescript };
-                document.getElementById('output').textContent = '✓ Ready! Enter your code and click Run.';
-                document.getElementById('output').className = 'success';
+                document.getElementById('output').innerHTML = '<span class="success">✓ Ready! Enter your code and press Run or Ctrl+Enter.</span>';
+                document.getElementById('status').innerHTML = '✓ Ready';
             } catch (error) {
                 document.getElementById('output').innerHTML = `<span class="error">Error loading WebAssembly module:\n${error.message}\n\nMake sure to build the project first with:\nwasm-pack build --target web --out-dir web/pkg</span>`;
+                document.getElementById('status').innerHTML = '✗ Error loading WebAssembly';
             }
         }
 
@@ -272,10 +438,16 @@ end.`
                 return;
             }
 
-            const code = document.getElementById('code').value;
+            if (!editor) {
+                document.getElementById('output').innerHTML = '<span class="error">Editor not initialized yet. Please wait...</span>';
+                return;
+            }
+
+            const code = editor.getValue();
             const outputDiv = document.getElementById('output');
 
             outputDiv.innerHTML = '<span class="loading">Running...</span>';
+            document.getElementById('status').innerHTML = '⏳ Running...';
 
             // Use setTimeout to allow UI to update
             setTimeout(() => {
@@ -283,8 +455,10 @@ end.`
                     const result = wasmModule.run_alescript(code);
                     outputDiv.textContent = result || '(no output)';
                     outputDiv.className = '';
+                    document.getElementById('status').innerHTML = '✓ Execution completed';
                 } catch (error) {
                     outputDiv.innerHTML = `<span class="error">Error:\n${error.message}</span>`;
+                    document.getElementById('status').innerHTML = '✗ Execution failed';
                 }
             }, 10);
         }
@@ -294,21 +468,10 @@ end.`
 
         document.getElementById('examples').addEventListener('change', (e) => {
             const example = e.target.value;
-            if (example && examples[example]) {
-                document.getElementById('code').value = examples[example];
+            if (example && examples[example] && editor) {
+                editor.setValue(examples[example]);
             }
         });
-
-        // Allow Ctrl+Enter to run code
-        document.getElementById('code').addEventListener('keydown', (e) => {
-            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-                e.preventDefault();
-                runCode();
-            }
-        });
-
-        // Initialize
-        initWasm();
     </script>
 </body>
 </html>
