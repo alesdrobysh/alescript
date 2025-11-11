@@ -57,6 +57,7 @@ pub enum TokenType {
     Recipe,
     Relabel,
     As,
+    End,
 
     // Ingredient keywords
     Water,
@@ -178,6 +179,7 @@ impl TokenType {
             "recipe" => Some(TokenType::Recipe),
             "relabel" => Some(TokenType::Relabel),
             "as" => Some(TokenType::As),
+            "end" => Some(TokenType::End),
 
             // Ingredients
             "water" => Some(TokenType::Water),

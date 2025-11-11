@@ -1,7 +1,13 @@
-mod token;
+mod ast;
+mod interpreter;
 mod lexer;
+mod parser;
+mod runtime;
+mod token;
 
+use interpreter::Interpreter;
 use lexer::Lexer;
+use parser::Parser;
 use std::env;
 use std::fs;
 use std::process;
@@ -27,12 +33,27 @@ fn main() {
         }
     };
 
-    println!("Tokenizing: {}", file_path);
-    println!("{:-<60}\n", "");
-
+    // Lexer: tokenize the source
     let lexer = Lexer::new(&source);
+    let tokens: Vec<_> = lexer.collect();
 
-    for token in lexer {
-        println!("{}", token);
+    // Parser: build AST
+    let mut parser = Parser::new(tokens);
+    let program = match parser.parse() {
+        Ok(prog) => prog,
+        Err(err) => {
+            eprintln!(
+                "Parse error at {}:{}: {}",
+                err.line, err.column, err.message
+            );
+            process::exit(1);
+        }
+    };
+
+    // Interpreter: execute the program
+    let mut interpreter = Interpreter::new();
+    if let Err(err) = interpreter.execute(&program) {
+        eprintln!("Runtime error: {}", err.message);
+        process::exit(1);
     }
 }
