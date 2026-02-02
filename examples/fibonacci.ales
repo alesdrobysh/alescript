@@ -7,9 +7,9 @@ recipe fibonacci(n)
     brew temp from water.
 
     repeat n times:
-        relabel a as temp.
-        mix a with b.
-        relabel temp as b.
+        relabel temp as a.
+        relabel a as b.
+        blend b with temp.
     end.
 
     a

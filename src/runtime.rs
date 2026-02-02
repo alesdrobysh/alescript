@@ -149,8 +149,8 @@ impl RuntimeEnvironment {
         }
     }
 
-    /// Mix two brews (add second's ABV to first)
-    pub fn mix_brews(&mut self, target: &str, source: &str) -> Result<(), String> {
+    /// Blend two brews (add second's ABV to first)
+    pub fn blend_brews(&mut self, target: &str, source: &str) -> Result<(), String> {
         // Update both brews to current time first
         let target_abv = self.get_brew_abv(target)?;
         let source_abv = self.get_brew_abv(source)?;
@@ -164,10 +164,10 @@ impl RuntimeEnvironment {
     }
 
     /// Multiply a brew's ABV by a factor (advances time)
-    /// Note: In alescript, "double by N" means multiply by N, not multiply by 2.
-    /// For example, "double porter by 3" multiplies the ABV by 3.
+    /// Note: In alescript, "fortify by N" means multiply by N, not multiply by 2.
+    /// For example, "fortify porter by 3" multiplies the ABV by 3.
     /// This operation advances time based on the brew's growth rate.
-    pub fn double_brew(&mut self, name: &str, factor: f64) -> Result<(), String> {
+    pub fn fortify_brew(&mut self, name: &str, factor: f64) -> Result<(), String> {
         let current_abv = self.get_brew_abv(name)?;
 
         if let Some(brew) = self.brews.get_mut(name) {
@@ -175,7 +175,7 @@ impl RuntimeEnvironment {
             let time_needed = if brew.growth_rate > 0.0 {
                 (target_abv - current_abv) / brew.growth_rate
             } else {
-                // If no growth rate, we can't double by waiting
+                // If no growth rate, we can't fortify by waiting
                 0.0
             };
 
@@ -192,8 +192,8 @@ impl RuntimeEnvironment {
         }
     }
 
-    /// Dilute a brew's ABV by a factor
-    pub fn dilute_brew(&mut self, name: &str, factor: f64) -> Result<(), String> {
+    /// Filter a brew's ABV by a factor
+    pub fn filter_brew(&mut self, name: &str, factor: f64) -> Result<(), String> {
         let current_abv = self.get_brew_abv(name)?;
 
         if let Some(brew) = self.brews.get_mut(name) {

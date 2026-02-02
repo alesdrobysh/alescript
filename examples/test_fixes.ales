@@ -7,10 +7,10 @@ taste test1.
 age test1 until 5%.
 toast "Test 1 passed".
 
-// Test 3: Verify double semantics
+// Test 3: Verify fortify semantics
 brew test3 from water, barley.
 wait for 5 days.
 taste test3.
-double test3 by 3.
-toast "After doubling by 3".
+fortify test3 by 3.
+toast "After fortifying by 3".
 taste test3.

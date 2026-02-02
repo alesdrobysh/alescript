@@ -22,8 +22,8 @@ keg lager.
 // Wait more - lager should stay at 10%, stout will continue growing
 wait for 2 days.
 
-// Mix brews together
-mix lager with stout.
+// Blend brews together
+blend lager with stout.
 
 // Judge the strength
 judge if lager is stronger than 5.0%:

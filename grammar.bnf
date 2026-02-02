@@ -10,9 +10,9 @@
               | <taste_stmt>
               | <toast_stmt>
               | <age_stmt>
-              | <mix_stmt>
-              | <double_stmt>
-              | <dilute_stmt>
+              | <blend_stmt>
+              | <fortify_stmt>
+              | <filter_stmt>
               | <conditional>
               | <loop>
               | <keg_stmt>
@@ -47,11 +47,11 @@
 <toast_stmt> ::= "toast" <expression> "."
 
 // Arithmetic operations
-<mix_stmt> ::= "mix" <identifier> "with" <identifier> "."
+<blend_stmt> ::= "blend" <identifier> "with" <identifier> "."
 
-<double_stmt> ::= "double" <identifier> "by" <number> "."
+<fortify_stmt> ::= "fortify" <identifier> "by" <number> "."
 
-<dilute_stmt> ::= "dilute" <identifier> "by" <number> "."
+<filter_stmt> ::= "filter" <identifier> "by" <number> "."
 
 // Conditionals
 <conditional> ::= <if_stmt> | <judge_stmt>

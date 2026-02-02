@@ -56,4 +56,7 @@ fn main() {
         eprintln!("Runtime error: {}", err.message);
         process::exit(1);
     }
+
+    // Print the output captured by the interpreter
+    print!("{}", interpreter.get_output());
 }

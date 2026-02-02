@@ -30,21 +30,21 @@ pub enum Statement {
     // Keg statement: keg lager.
     Keg { brew_name: String },
 
-    // Mix statement: mix lager with stout.
-    Mix {
+    // Blend statement: blend lager with stout.
+    Blend {
         target: String,
         source: String,
     },
 
-    // Double statement: double porter by 3.
-    // Note: "double by N" means multiply ABV by N (not necessarily by 2)
-    Double {
+    // Fortify statement: fortify porter by 3.
+    // Note: "fortify by N" means multiply ABV by N (not necessarily by 2)
+    Fortify {
         brew_name: String,
         factor: Expression,
     },
 
-    // Dilute statement: dilute ipa by 2.
-    Dilute {
+    // Filter statement: filter ipa by 2.
+    Filter {
         brew_name: String,
         factor: Expression,
     },
@@ -58,7 +58,7 @@ pub enum Statement {
     },
 
     // Relabel statement (assignment): relabel temp as a.
-    Relabel { from: String, to: String },
+    Relabel { name: String, value: Expression },
 
     // Judge/If conditional
     Judge {
@@ -167,6 +167,18 @@ pub enum Condition {
 
     // Negation: if n is not 0
     IsNotZero { name: String },
+
+    // Exact comparison: if lager is 5.0%
+    Equals {
+        brew_name: String,
+        threshold: f64,
+    },
+
+    // Not exact comparison: if lager is not 5.0%
+    NotEquals {
+        brew_name: String,
+        threshold: f64,
+    },
 }
 
 #[derive(Debug, Clone, PartialEq)]

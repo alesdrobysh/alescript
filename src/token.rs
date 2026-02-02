@@ -20,11 +20,11 @@ pub enum TokenType {
     Toast,
 
     // Keywords - arithmetic
-    Mix,
+    Blend,
     With,
-    Double,
+    Fortify,
     By,
-    Dilute,
+    Filter,
 
     // Keywords - conditionals
     If,
@@ -142,11 +142,11 @@ impl TokenType {
             "toast" => Some(TokenType::Toast),
 
             // Arithmetic
-            "mix" => Some(TokenType::Mix),
+            "blend" => Some(TokenType::Blend),
             "with" => Some(TokenType::With),
-            "double" => Some(TokenType::Double),
+            "fortify" => Some(TokenType::Fortify),
             "by" => Some(TokenType::By),
-            "dilute" => Some(TokenType::Dilute),
+            "filter" => Some(TokenType::Filter),
 
             // Conditionals
             "if" => Some(TokenType::If),

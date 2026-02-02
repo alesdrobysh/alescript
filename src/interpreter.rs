@@ -49,6 +49,17 @@ impl Interpreter {
         Ok(())
     }
 
+    fn resolve_brew_name(&self, name: &str) -> String {
+        if let Some(value) = self.get_local_variable(name) {
+            match value {
+                Value::BrewRef(actual_name) => actual_name,
+                _ => name.to_string(),
+            }
+        } else {
+            name.to_string()
+        }
+    }
+
     fn execute_statement(&mut self, statement: &Statement) -> RuntimeResult<Value> {
         match statement {
             Statement::Brew { name, ingredients } => {
@@ -72,26 +83,18 @@ impl Interpreter {
                 brew_name,
                 target_abv,
             } => {
+                let actual_name = self.resolve_brew_name(brew_name);
                 self.runtime
-                    .age_until(brew_name, *target_abv)
+                    .age_until(&actual_name, *target_abv)
                     .map_err(|e| RuntimeError::new(e))?;
                 Ok(Value::Void)
             }
 
             Statement::Taste { brew_name } => {
-                // Check if brew_name is a variable first
-                let actual_brew_name = if let Some(value) = self.get_local_variable(brew_name) {
-                    match value {
-                        Value::BrewRef(name) => name,
-                        _ => brew_name.clone(),
-                    }
-                } else {
-                    brew_name.clone()
-                };
-
+                let actual_name = self.resolve_brew_name(brew_name);
                 let abv = self
                     .runtime
-                    .get_brew_abv(&actual_brew_name)
+                    .get_brew_abv(&actual_name)
                     .map_err(|e| RuntimeError::new(e))?;
                 self.print(format!("{}% ABV", abv));
                 Ok(Value::Void)
@@ -115,37 +118,42 @@ impl Interpreter {
             }
 
             Statement::Keg { brew_name } => {
+                let actual_name = self.resolve_brew_name(brew_name);
                 self.runtime
-                    .keg_brew(brew_name)
+                    .keg_brew(&actual_name)
                     .map_err(|e| RuntimeError::new(e))?;
                 Ok(Value::Void)
             }
 
-            Statement::Mix { target, source } => {
+            Statement::Blend { target, source } => {
+                let actual_target = self.resolve_brew_name(target);
+                let actual_source = self.resolve_brew_name(source);
                 self.runtime
-                    .mix_brews(target, source)
+                    .blend_brews(&actual_target, &actual_source)
                     .map_err(|e| RuntimeError::new(e))?;
                 Ok(Value::Void)
             }
 
-            Statement::Double { brew_name, factor } => {
+            Statement::Fortify { brew_name, factor } => {
+                let actual_name = self.resolve_brew_name(brew_name);
                 let factor_value = self.evaluate_expression(factor)?;
                 let factor_num = factor_value
                     .as_number()
                     .map_err(|e| RuntimeError::new(e))?;
                 self.runtime
-                    .double_brew(brew_name, factor_num)
+                    .fortify_brew(&actual_name, factor_num)
                     .map_err(|e| RuntimeError::new(e))?;
                 Ok(Value::Void)
             }
 
-            Statement::Dilute { brew_name, factor } => {
+            Statement::Filter { brew_name, factor } => {
+                let actual_name = self.resolve_brew_name(brew_name);
                 let factor_value = self.evaluate_expression(factor)?;
                 let factor_num = factor_value
                     .as_number()
                     .map_err(|e| RuntimeError::new(e))?;
                 self.runtime
-                    .dilute_brew(brew_name, factor_num)
+                    .filter_brew(&actual_name, factor_num)
                     .map_err(|e| RuntimeError::new(e))?;
                 Ok(Value::Void)
             }
@@ -161,11 +169,18 @@ impl Interpreter {
                 Ok(Value::Void)
             }
 
-            Statement::Relabel { from, to } => {
-                // "relabel X as Y" means Y = X (copy X's value to Y)
-                self.runtime
-                    .copy_brew(from, to.clone())
-                    .map_err(|e| RuntimeError::new(e))?;
+            Statement::Relabel { name, value } => {
+                let val = self.evaluate_expression(value)?;
+                match val {
+                    Value::BrewRef(source_name) => {
+                        self.runtime
+                            .copy_brew(&source_name, name.clone())
+                            .map_err(|e| RuntimeError::new(e))?;
+                    }
+                    _ => {
+                        self.runtime.set_variable(name.clone(), val);
+                    }
+                }
                 Ok(Value::Void)
             }
 
@@ -239,7 +254,8 @@ impl Interpreter {
                 brew_name,
                 barrel_name,
             } => {
-                let value = Value::BrewRef(brew_name.clone());
+                let actual_name = self.resolve_brew_name(brew_name);
+                let value = Value::BrewRef(actual_name);
                 let barrel = self
                     .runtime
                     .get_barrel_mut(barrel_name)
@@ -252,12 +268,13 @@ impl Interpreter {
                 brew_name,
                 barrel_name,
             } => {
+                let actual_name = self.resolve_brew_name(brew_name);
                 let barrel = self
                     .runtime
                     .get_barrel_mut(barrel_name)
                     .map_err(|e| RuntimeError::new(e))?;
                 barrel.retain(|v| match v {
-                    Value::BrewRef(name) => name != brew_name,
+                    Value::BrewRef(name) => name != &actual_name,
                     _ => true,
                 });
                 Ok(Value::Void)
@@ -359,9 +376,10 @@ impl Interpreter {
                 brew_name,
                 threshold,
             } => {
+                let actual_name = self.resolve_brew_name(brew_name);
                 let abv = self
                     .runtime
-                    .get_brew_abv(brew_name)
+                    .get_brew_abv(&actual_name)
                     .map_err(|e| RuntimeError::new(e))?;
                 Ok(self.runtime.fuzzy_compare(abv, *threshold, true))
             }
@@ -369,9 +387,10 @@ impl Interpreter {
                 brew_name,
                 threshold,
             } => {
+                let actual_name = self.resolve_brew_name(brew_name);
                 let abv = self
                     .runtime
-                    .get_brew_abv(brew_name)
+                    .get_brew_abv(&actual_name)
                     .map_err(|e| RuntimeError::new(e))?;
                 Ok(self.runtime.fuzzy_compare(abv, *threshold, false))
             }
@@ -379,9 +398,10 @@ impl Interpreter {
                 brew_name,
                 threshold,
             } => {
+                let actual_name = self.resolve_brew_name(brew_name);
                 let abv = self
                     .runtime
-                    .get_brew_abv(brew_name)
+                    .get_brew_abv(&actual_name)
                     .map_err(|e| RuntimeError::new(e))?;
                 Ok(!self.runtime.fuzzy_compare(abv, *threshold, false))
             }
@@ -389,9 +409,10 @@ impl Interpreter {
                 brew_name,
                 threshold,
             } => {
+                let actual_name = self.resolve_brew_name(brew_name);
                 let abv = self
                     .runtime
-                    .get_brew_abv(brew_name)
+                    .get_brew_abv(&actual_name)
                     .map_err(|e| RuntimeError::new(e))?;
                 Ok(!self.runtime.fuzzy_compare(abv, *threshold, true))
             }
@@ -404,6 +425,30 @@ impl Interpreter {
                 let value = self.evaluate_expression(&Expression::Identifier(name.clone()))?;
                 let num = value.as_number().map_err(|e| RuntimeError::new(e))?;
                 Ok(num != 0.0)
+            }
+            Condition::Equals {
+                brew_name,
+                threshold,
+            } => {
+                let actual_name = self.resolve_brew_name(brew_name);
+                let abv = self
+                    .runtime
+                    .get_brew_abv(&actual_name)
+                    .map_err(|e| RuntimeError::new(e))?;
+                // Even for "exact" equality in alescript, it might be fuzzy, but let's try exact first
+                // or use a very small epsilon.
+                Ok((abv - threshold).abs() < 0.001)
+            }
+            Condition::NotEquals {
+                brew_name,
+                threshold,
+            } => {
+                let actual_name = self.resolve_brew_name(brew_name);
+                let abv = self
+                    .runtime
+                    .get_brew_abv(&actual_name)
+                    .map_err(|e| RuntimeError::new(e))?;
+                Ok((abv - threshold).abs() >= 0.001)
             }
         }
     }

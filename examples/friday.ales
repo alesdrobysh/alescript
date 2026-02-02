@@ -1,0 +1,30 @@
+// ---------------------------------------------
+// The "Weekend Protocol"
+// Automating the perfect Friday evening pint.
+// ---------------------------------------------
+
+// 1. Start the brew with high-energy ingredients
+brew friday_ipa from water, 4 barley, 3 hops, 1 yeast.
+
+toast "Work week ending... Brewing in progress.".
+
+// 2. The wait is literal.
+// Instead of calculating, we let the code mature.
+age friday_ipa until is 5.5% abv.
+
+// 3. Quality Control (Fuzzy Logic)
+judge if friday_ipa is stronger than 6.0%:
+    toast "Whoa, it's been a tough week!".
+    // Smooth it out slightly
+    filter friday_ipa by 1.1.
+else:
+    toast "Smooth sailing.".
+    // Add a little kick
+    fortify friday_ipa by 1.05.
+end.
+
+// 4. Lock the flavor so it doesn't spoil
+keg friday_ipa.
+
+toast "Your pint is ready. Cheers!".
+taste friday_ipa.

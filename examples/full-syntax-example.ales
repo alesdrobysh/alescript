@@ -1,0 +1,65 @@
+// Feature: Recipe Declaration (Function) with parameters
+recipe refine_batch(input_brew)
+    // Feature: Arithmetic (Multiplication)
+    fortify input_brew by 1.2.
+
+    // Feature: Arithmetic (Division)
+    filter input_brew by 1.1.
+
+    // Feature: Return value
+    input_brew
+end.
+
+// Feature: Variable Declaration & Ingredients
+brew pale_ale from water, 5 barley, 2 hops.
+brew dark_stout from water, 1 yeast.
+
+// Feature: Barrel Declaration (Array)
+barrel cellar = [pale_ale, dark_stout].
+
+// Feature: Loop (For-each)
+repeat each item in cellar:
+    // Feature: Time Control (Wait)
+    wait for 1 day.
+
+    // Feature: Conditional (Judge - Fuzzy Logic)
+    judge if item is stronger than 1.0%:
+        // Feature: Arithmetic (Addition/Blend)
+        blend item with dark_stout.
+    else:
+        // Feature: Output (Toast)
+        toast "Brew is too weak.".
+    end.
+end.
+
+// Feature: Loop (Repeat N times)
+repeat 2 times:
+    wait for 1 day.
+end.
+
+// Feature: Relabeling (Assignment) & Recipe Call
+relabel pale_ale as refine_batch(pale_ale).
+
+// Feature: Targeted Aging (Time Jump)
+// Note: This advances global time until condition is met
+age dark_stout until is 5.0% abv.
+
+// Feature: Kegging (Freezing state - const)
+keg dark_stout.
+
+// Feature: Barrel Manipulation (Add/Remove)
+remove pale_ale from cellar.
+add dark_stout to cellar.
+
+// Feature: Barrel Access by Index
+brew final_sample = cellar position 1.
+
+// Feature: Conditional (Strict If/Else)
+if final_sample is 5.0%:
+    toast "QC Passed: Stout is stable.".
+else:
+    toast "QC Failed: ABVs do not match.".
+end.
+
+// Feature: Final Output (Taste)
+taste final_sample.

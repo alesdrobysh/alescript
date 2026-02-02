@@ -86,9 +86,9 @@ alescript allows controlled **mathematical operations** using **brewing metaphor
 
 | operator | brewery metaphor | example usage |
 |----------|-----------------|--------------|
-| **addition (`+`)** | **mix** (blending two brews together) | `mix lager with stout.` |
-| **multiplication (`*`)** | **double** (scaling up the brew) | `double porter by 3.` |
-| **division (`/`)** | **dilute** (weakening a beer by adding water) | `dilute ipa by 2.` |
+| **addition (`+`)** | **blend** (blending two brews together) | `blend lager with stout.` |
+| **multiplication (`*`)** | **fortify** (scaling up the brew) | `fortify porter by 3.` |
+| **division (`/`)** | **filter** (weakening a beer by adding water) | `filter ipa by 2.` |
 
 ```alescript
 brew ipa from water, barley, hops, yeast.
@@ -96,16 +96,16 @@ brew stout from water, barley, hops, yeast.
 
 wait for 3 days.
 
-mix ipa with stout.
-double porter by 3.
-dilute ipa by 2.
+blend ipa with stout.
+fortify porter by 3.
+filter ipa by 2.
 ```
 
 There is no **subtraction** in alescript. Seriously, how this is possible?
 
-There are no negative values in alescript. If you want to **reduce** the alcohol content of a brew, you can **dilute** it with **water**.
+There are no negative values in alescript. If you want to **reduce** the alcohol content of a brew, you can **filter** it with **water**.
 
-Note that **double** operation advances the global timeline. You need time to make your beer more potent.
+Note that **fortify** operation advances the global timeline. You need time to make your beer more potent.
 
 ---
 
@@ -253,7 +253,7 @@ recipe fibonacci(n)
     else:
         repeat n times:
             relabel temp as a.
-            mix a with b.
+            blend a with b.
             relabel b as a.
             relabel a as temp.
 

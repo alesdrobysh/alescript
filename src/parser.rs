@@ -66,29 +66,13 @@ impl Parser {
         }
     }
 
-    fn skip_newlines(&mut self) {
-        while let Some(token) = &self.current {
-            if token.token_type == TokenType::Newline {
-                self.advance();
-            } else {
-                break;
-            }
-        }
-    }
-
-    fn skip_comments(&mut self) {
-        while let Some(token) = &self.current {
-            if matches!(token.token_type, TokenType::Comment(_)) {
-                self.advance();
-            } else {
-                break;
-            }
-        }
-    }
-
     fn skip_whitespace(&mut self) {
-        self.skip_newlines();
-        self.skip_comments();
+        while let Some(token) = &self.current {
+            match token.token_type {
+                TokenType::Newline | TokenType::Comment(_) => self.advance(),
+                _ => break,
+            }
+        }
     }
 
     pub fn parse(&mut self) -> ParseResult<Program> {
@@ -123,9 +107,9 @@ impl Parser {
             TokenType::Taste => self.parse_taste(),
             TokenType::Toast => self.parse_toast(),
             TokenType::Keg => self.parse_keg(),
-            TokenType::Mix => self.parse_mix(),
-            TokenType::Double => self.parse_double(),
-            TokenType::Dilute => self.parse_dilute(),
+            TokenType::Blend => self.parse_blend(),
+            TokenType::Fortify => self.parse_fortify(),
+            TokenType::Filter => self.parse_filter(),
             TokenType::Recipe => self.parse_recipe(),
             TokenType::Relabel => self.parse_relabel(),
             TokenType::Judge | TokenType::If => self.parse_judge(),
@@ -151,6 +135,7 @@ impl Parser {
     }
 
     // brew lager from water, 1 barley, 2 hops, 1 yeast.
+    // OR: brew selected = taplist position 1.
     fn parse_brew(&mut self) -> ParseResult<Statement> {
         self.expect(TokenType::Brew)?;
         let name_token = self.current_token()?.clone();
@@ -165,12 +150,20 @@ impl Parser {
         };
         self.advance();
 
-        self.expect(TokenType::From)?;
+        let token = self.current_token()?.clone();
+        if token.token_type == TokenType::Equal {
+            self.advance();
+            let value = self.parse_expression()?;
+            self.expect(TokenType::Period)?;
+            Ok(Statement::Relabel { name, value })
+        } else {
+            self.expect(TokenType::From)?;
 
-        let ingredients = self.parse_ingredients()?;
-        self.expect(TokenType::Period)?;
+            let ingredients = self.parse_ingredients()?;
+            self.expect(TokenType::Period)?;
 
-        Ok(Statement::Brew { name, ingredients })
+            Ok(Statement::Brew { name, ingredients })
+        }
     }
 
     fn parse_ingredients(&mut self) -> ParseResult<Vec<Ingredient>> {
@@ -249,6 +242,13 @@ impl Parser {
 
         self.expect(TokenType::Until)?;
 
+        // Optional 'is'
+        if let Some(token) = &self.current {
+            if token.token_type == TokenType::Is {
+                self.advance();
+            }
+        }
+
         let target_token = self.current_token()?.clone();
         let target_abv = match target_token.token_type {
             TokenType::Percentage(p) => p,
@@ -261,6 +261,13 @@ impl Parser {
             }
         };
         self.advance();
+
+        // Optional 'abv'
+        if let Some(token) = &self.current {
+            if token.token_type == TokenType::Abv {
+                self.advance();
+            }
+        }
 
         self.expect(TokenType::Period)?;
 
@@ -317,9 +324,9 @@ impl Parser {
         Ok(Statement::Keg { brew_name })
     }
 
-    // mix lager with stout.
-    fn parse_mix(&mut self) -> ParseResult<Statement> {
-        self.expect(TokenType::Mix)?;
+    // blend lager with stout.
+    fn parse_blend(&mut self) -> ParseResult<Statement> {
+        self.expect(TokenType::Blend)?;
         let target_token = self.current_token()?.clone();
         let target = match &target_token.token_type {
             TokenType::Identifier(s) => s.clone(),
@@ -348,12 +355,12 @@ impl Parser {
 
         self.expect(TokenType::Period)?;
 
-        Ok(Statement::Mix { target, source })
+        Ok(Statement::Blend { target, source })
     }
 
-    // double porter by 3.
-    fn parse_double(&mut self) -> ParseResult<Statement> {
-        self.expect(TokenType::Double)?;
+    // fortify porter by 3.
+    fn parse_fortify(&mut self) -> ParseResult<Statement> {
+        self.expect(TokenType::Fortify)?;
         let brew_name_token = self.current_token()?.clone();
         let brew_name = match &brew_name_token.token_type {
             TokenType::Identifier(s) => s.clone(),
@@ -371,12 +378,12 @@ impl Parser {
         let factor = self.parse_expression()?;
         self.expect(TokenType::Period)?;
 
-        Ok(Statement::Double { brew_name, factor })
+        Ok(Statement::Fortify { brew_name, factor })
     }
 
-    // dilute ipa by 2.
-    fn parse_dilute(&mut self) -> ParseResult<Statement> {
-        self.expect(TokenType::Dilute)?;
+    // filter ipa by 2.
+    fn parse_filter(&mut self) -> ParseResult<Statement> {
+        self.expect(TokenType::Filter)?;
         let brew_name_token = self.current_token()?.clone();
         let brew_name = match &brew_name_token.token_type {
             TokenType::Identifier(s) => s.clone(),
@@ -394,19 +401,19 @@ impl Parser {
         let factor = self.parse_expression()?;
         self.expect(TokenType::Period)?;
 
-        Ok(Statement::Dilute { brew_name, factor })
+        Ok(Statement::Filter { brew_name, factor })
     }
 
     // relabel temp as a.
     fn parse_relabel(&mut self) -> ParseResult<Statement> {
         self.expect(TokenType::Relabel)?;
-        let from_token = self.current_token()?.clone();
-        let from = match &from_token.token_type {
+        let name_token = self.current_token()?.clone();
+        let name = match &name_token.token_type {
             TokenType::Identifier(s) => s.clone(),
             _ => {
                 return Err(ParseError::new(
                     "Expected identifier".to_string(),
-                    &from_token,
+                    &name_token,
                 ))
             }
         };
@@ -414,21 +421,11 @@ impl Parser {
 
         self.expect(TokenType::As)?;
 
-        let to_token = self.current_token()?.clone();
-        let to = match &to_token.token_type {
-            TokenType::Identifier(s) => s.clone(),
-            _ => {
-                return Err(ParseError::new(
-                    "Expected identifier".to_string(),
-                    &to_token,
-                ))
-            }
-        };
-        self.advance();
+        let value = self.parse_expression()?;
 
         self.expect(TokenType::Period)?;
 
-        Ok(Statement::Relabel { from, to })
+        Ok(Statement::Relabel { name, value })
     }
 
     // recipe fibonacci(n) ... end.
@@ -677,11 +674,33 @@ impl Parser {
                         Condition::IsZero { name }
                     })
                 } else {
-                    Err(ParseError::new(
-                        "Only 'is 0' comparisons are supported for simple equality".to_string(),
-                        &token,
-                    ))
+                    Ok(if negated {
+                        Condition::NotEquals {
+                            brew_name: name,
+                            threshold,
+                        }
+                    } else {
+                        Condition::Equals {
+                            brew_name: name,
+                            threshold,
+                        }
+                    })
                 }
+            }
+            TokenType::Percentage(n) => {
+                let threshold = *n;
+                self.advance();
+                Ok(if negated {
+                    Condition::NotEquals {
+                        brew_name: name,
+                        threshold,
+                    }
+                } else {
+                    Condition::Equals {
+                        brew_name: name,
+                        threshold,
+                    }
+                })
             }
             _ => Err(ParseError::new(
                 "Expected 'stronger' or 'weaker'".to_string(),
