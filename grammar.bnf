@@ -1,136 +1,134 @@
-// alescript BNF Grammar
-// Lines end with '.' and blocks use ':' with indentation
+-- AleScript Grammar for BNFC
+-- Converted to proper BNFC syntax
 
-<program> ::= <statement_list>
+-- Token definitions
+token Identifier (letter | '_') (letter | digit | '_')* ;
+token Number digit+ | digit+ '.' digit+ ;
+token Percentage digit+ ('.' digit+)? '%' ;
+token StringLit '"' ((char - ["\"\\"]) | ('\\' char))* '"' ;
 
-<statement_list> ::= <statement> | <statement> <statement_list>
+comment "//" ;
 
-<statement> ::= <brew_decl>
-              | <wait_stmt>
-              | <taste_stmt>
-              | <toast_stmt>
-              | <age_stmt>
-              | <blend_stmt>
-              | <fortify_stmt>
-              | <filter_stmt>
-              | <conditional>
-              | <loop>
-              | <keg_stmt>
-              | <barrel_decl>
-              | <barrel_add>
-              | <barrel_remove>
-              | <recipe_decl>
-              | <recipe_call>
-              | <relabel_stmt>
-              | <comment>
+-- List separators
+separator Statement "" ;
+separator nonempty Ingredient "," ;
+separator nonempty Identifier "," ;
+separator nonempty Expression "," ;
 
-// Variable declarations
-<brew_decl> ::= "brew" <identifier> "from" <ingredient_list> "."
+-- Top-level program
+Prog. Program ::= [Statement] ;
 
-<ingredient_list> ::= <ingredient>
-                    | <ingredient> "," <ingredient_list>
+-- Statement types
+SBrewDecl. Statement ::= BrewDecl ;
+SWaitStmt. Statement ::= WaitStmt ;
+STasteStmt. Statement ::= TasteStmt ;
+SToastStmt. Statement ::= ToastStmt ;
+SAgeStmt. Statement ::= AgeStmt ;
+SBlendStmt. Statement ::= BlendStmt ;
+SFortifyStmt. Statement ::= FortifyStmt ;
+SFilterStmt. Statement ::= FilterStmt ;
+SConditional. Statement ::= Conditional ;
+SLoop. Statement ::= Loop ;
+SKegStmt. Statement ::= KegStmt ;
+SBarrelDecl. Statement ::= BarrelDecl ;
+SBarrelAdd. Statement ::= BarrelAdd ;
+SBarrelRemove. Statement ::= BarrelRemove ;
+SRecipeDecl. Statement ::= RecipeDecl ;
+SRecipeCallStmt. Statement ::= RecipeCallStmt ;
+SRelabelStmt. Statement ::= RelabelStmt ;
+SReturnStmt. Statement ::= ReturnStmt ;
+SComment. Statement ::= Comment ;
 
-<ingredient> ::= <ingredient_name>
-               | <number> <ingredient_name>
+-- Brew declarations
+BrewFrom. BrewDecl ::= "brew" Identifier "from" [Ingredient] "." ;
+BrewExpr. BrewDecl ::= "brew" Identifier "=" Expression "." ;
 
-<ingredient_name> ::= "water" | "barley" | "hops" | "yeast"
+-- Ingredients
+SimpleIngredient. Ingredient ::= IngredientName ;
+QuantifiedIngredient. Ingredient ::= Number IngredientName ;
 
-// Time control
-<wait_stmt> ::= "wait" "for" <number> "days" "."
-              | "wait" "for" <number> "day" "."
+Water. IngredientName ::= "water" ;
+Barley. IngredientName ::= "barley" ;
+Hops. IngredientName ::= "hops" ;
+Yeast. IngredientName ::= "yeast" ;
 
-<age_stmt> ::= "age" <identifier> "until" "is" <percentage> "abv" "."
+-- Wait statements
+WaitDays. WaitStmt ::= "wait" "for" Number "days" "." ;
+WaitDay. WaitStmt ::= "wait" "for" Number "day" "." ;
 
-// Output
-<taste_stmt> ::= "taste" <identifier> "."
+-- Age statement
+Age. AgeStmt ::= "age" Identifier "until" Percentage "." ;
 
-<toast_stmt> ::= "toast" <expression> "."
+-- Taste statement
+Taste. TasteStmt ::= "taste" Identifier "." ;
 
-// Arithmetic operations
-<blend_stmt> ::= "blend" <identifier> "with" <identifier> "."
+-- Toast statement
+Toast. ToastStmt ::= "toast" Expression "." ;
 
-<fortify_stmt> ::= "fortify" <identifier> "by" <number> "."
+-- Blend statement
+Blend. BlendStmt ::= "blend" Identifier "with" Identifier "." ;
 
-<filter_stmt> ::= "filter" <identifier> "by" <number> "."
+-- Fortify statement
+Fortify. FortifyStmt ::= "fortify" Identifier "by" Number "." ;
 
-// Conditionals
-<conditional> ::= <if_stmt> | <judge_stmt>
+-- Filter statement
+Filter. FilterStmt ::= "filter" Identifier "by" Number "." ;
 
-<if_stmt> ::= "if" <comparison> ":" <block>
-            | "if" <comparison> ":" <block> "else" ":" <block>
+-- Keg statement
+Keg. KegStmt ::= "keg" Identifier "." ;
 
-<judge_stmt> ::= "judge" "if" <comparison> ":" <block>
-               | "judge" "if" <comparison> ":" <block> "else" ":" <block>
+-- Conditionals
+CondIf. Conditional ::= IfStmt ;
+CondJudge. Conditional ::= JudgeStmt ;
 
-<comparison> ::= <identifier> "is" <percentage>
-               | <identifier> "is" "stronger" "than" <percentage>
-               | <identifier> "is" "weaker" "than" <percentage>
-               | <identifier> "is" "not" "weaker" "than" <percentage>
-               | <identifier> "is" "not" "stronger" "than" <percentage>
-               | <identifier> "is" <number>
+IfSimple. IfStmt ::= "if" Comparison ":" [Statement] "end" "." ;
+IfElse. IfStmt ::= "if" Comparison ":" [Statement] "else" ":" [Statement] "end" "." ;
 
-// Loops
-<loop> ::= "repeat" "until" <comparison> ":" <block>
-         | "repeat" <number> "times" ":" <block>
-         | "for" "each" <identifier> "in" <identifier> ":" <block>
+JudgeSimple. JudgeStmt ::= "judge" "if" Comparison ":" [Statement] "end" "." ;
+JudgeElse. JudgeStmt ::= "judge" "if" Comparison ":" [Statement] "else" ":" [Statement] "end" "." ;
 
-// Kegging
-<keg_stmt> ::= "keg" <identifier> "."
+-- Comparisons
+CompIs. Comparison ::= Identifier "is" Percentage ;
+CompStronger. Comparison ::= Identifier "is" "stronger" "than" Percentage ;
+CompWeaker. Comparison ::= Identifier "is" "weaker" "than" Percentage ;
+CompNotWeaker. Comparison ::= Identifier "is" "not" "weaker" "than" Percentage ;
+CompNotStronger. Comparison ::= Identifier "is" "not" "stronger" "than" Percentage ;
+CompIsNumber. Comparison ::= Identifier "is" Number ;
 
-// Barrels (arrays)
-<barrel_decl> ::= "barrel" <identifier> "=" "[" <barrel_contents> "]" "."
+-- Loops
+RepeatUntil. Loop ::= "repeat" "until" Comparison ":" [Statement] "end" "." ;
+RepeatTimes. Loop ::= "repeat" Expression "times" ":" [Statement] "end" "." ;
+RepeatEach. Loop ::= "repeat" "each" Identifier "in" Identifier ":" [Statement] "end" "." ;
 
-<barrel_contents> ::= <empty>
-                    | <identifier_list>
+-- Barrel operations
+BarrelDef. BarrelDecl ::= "barrel" Identifier "=" "[" [Identifier] "]" "." ;
 
-<identifier_list> ::= <identifier>
-                    | <identifier> "," <identifier_list>
+BarrelAddOp. BarrelAdd ::= "add" Identifier "to" Identifier "." ;
 
-<barrel_add> ::= "add" <identifier> "to" <identifier> "."
+BarrelRemoveOp. BarrelRemove ::= "remove" Identifier "from" Identifier "." ;
 
-<barrel_remove> ::= "remove" <identifier> "from" <identifier> "."
+BarrelPos. BarrelAccess ::= Identifier "position" Number ;
 
-<barrel_access> ::= <identifier> "position" <number>
+-- Recipe declarations and calls
+RecipeDef. RecipeDecl ::= "recipe" Identifier "(" [Identifier] ")" [Statement] "end" "." ;
 
-// Recipes (functions)
-<recipe_decl> ::= "recipe" <identifier> "(" <param_list> ")" "{" <block> "}"
+RecipeStmt. RecipeCallStmt ::= RecipeCall "." ;
 
-<param_list> ::= <empty>
-               | <identifier>
-               | <identifier> "," <param_list>
+RecCall. RecipeCall ::= Identifier "(" [Expression] ")" ;
 
-<recipe_call> ::= <identifier> "(" <arg_list> ")"
+-- Relabel statement
+Relabel. RelabelStmt ::= "relabel" Identifier "as" Expression "." ;
 
-<arg_list> ::= <empty>
-             | <expression>
-             | <expression> "," <arg_list>
+-- Return statement
+Return. ReturnStmt ::= Identifier ;
 
-// Relabeling (reassignment)
-<relabel_stmt> ::= "relabel" <identifier> "as" <identifier> "."
+-- Comment (handled by comment directive)
+CommentStmt. Comment ::= ;
 
-// Blocks and expressions
-<block> ::= <statement> | <statement> <block>
-
-<expression> ::= <identifier>
-               | <number>
-               | <string>
-               | <percentage>
-               | <recipe_call>
-               | <barrel_access>
-
-// Primitives
-<identifier> ::= [a-zA-Z_][a-zA-Z0-9_]*
-
-<number> ::= [0-9]+ | [0-9]+ "." [0-9]+
-
-<percentage> ::= <number> "%"
-
-<string> ::= '"' <char_sequence> '"'
-
-<char_sequence> ::= <empty> | <char> <char_sequence>
-
-<char> ::= any character except '"'
-
-<comment> ::= "//" <any_chars_until_newline>
-
-<empty> ::=
+-- Expressions
+EIdentifier. Expression ::= Identifier ;
+ENumber. Expression ::= Number ;
+EString. Expression ::= StringLit ;
+EPercentage. Expression ::= Percentage ;
+ERecipeCall. Expression ::= RecipeCall ;
+EBarrelAccess. Expression ::= BarrelAccess ;

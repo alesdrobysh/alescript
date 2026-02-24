@@ -10,7 +10,7 @@ toast "Work week ending... Brewing in progress.".
 
 // 2. The wait is literal.
 // Instead of calculating, we let the code mature.
-age friday_ipa until is 5.5% abv.
+age friday_ipa until 5.5%.
 
 // 3. Quality Control (Fuzzy Logic)
 judge if friday_ipa is stronger than 6.0%:

@@ -42,7 +42,7 @@ relabel pale_ale as refine_batch(pale_ale).
 
 // Feature: Targeted Aging (Time Jump)
 // Note: This advances global time until condition is met
-age dark_stout until is 5.0% abv.
+age dark_stout until 5.0%.
 
 // Feature: Kegging (Freezing state - const)
 keg dark_stout.

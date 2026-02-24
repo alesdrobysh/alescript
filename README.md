@@ -52,7 +52,7 @@ This will **increase all your beers' alcohol content** as time passes. computati
 If you need **exact values**, you must **age your brew to perfection**.
 
 ```alescript
-age lager until is 5.2%.
+age lager until 5.2%.
 ```
 Instead of manually incrementing numbers, you **let your brew mature**.
 
