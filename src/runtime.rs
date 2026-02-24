@@ -46,12 +46,6 @@ impl Value {
         }
     }
 
-    pub fn as_string(&self) -> Result<String, String> {
-        match self {
-            Value::String(s) => Ok(s.clone()),
-            _ => Err(format!("Expected string, got {:?}", self)),
-        }
-    }
 }
 
 /// Runtime environment managing all state

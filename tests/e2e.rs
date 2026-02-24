@@ -1,10 +1,11 @@
+use assert_cmd::cargo_bin;
 use assert_cmd::prelude::*;
-use std::process::Command;
 use predicates::prelude::*;
+use std::process::Command;
 
 #[test]
 fn test_hello_world() -> Result<(), Box<dyn std::error::Error>> {
-    let mut cmd = Command::cargo_bin("alescript")?;
+    let mut cmd = Command::new(cargo_bin!("alescript"));
     cmd.arg("examples/hello.ales");
     cmd.assert()
         .success()
@@ -14,19 +15,17 @@ fn test_hello_world() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 fn test_fibonacci() -> Result<(), Box<dyn std::error::Error>> {
-    let mut cmd = Command::cargo_bin("alescript")?;
+    let mut cmd = Command::new(cargo_bin!("alescript"));
     cmd.arg("examples/fibonacci.ales");
-    cmd.assert()
-        .success()
-        .stdout(predicate::eq("55% ABV\n"));
+    cmd.assert().success().stdout(predicate::eq("55% ABV\n"));
     Ok(())
 }
 
 #[test]
 fn test_brewing() -> Result<(), Box<dyn std::error::Error>> {
-    let mut cmd = Command::cargo_bin("alescript")?;
+    let mut cmd = Command::new(cargo_bin!("alescript"));
     cmd.arg("examples/brewing.ales");
-    
+
     // Using contains because of potential floating point precision differences across platforms
     // although they should be consistent for these simple calculations.
     cmd.assert()
@@ -41,22 +40,25 @@ fn test_brewing() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 fn test_friday() -> Result<(), Box<dyn std::error::Error>> {
-    let mut cmd = Command::cargo_bin("alescript")?;
+    let mut cmd = Command::new(cargo_bin!("alescript"));
     cmd.arg("examples/friday.ales");
-    
+
     // Note: friday.ales has a judge statement that might be flaky due to fuzzy logic.
     // However, 5.5% vs 6.0% is usually enough of a gap.
     let assert = cmd.assert().success();
-    
-    assert.stdout(predicate::str::contains("Work week ending... Brewing in progress."))
-          .stdout(predicate::str::contains("Your pint is ready. Cheers!"));
+
+    assert
+        .stdout(predicate::str::contains(
+            "Work week ending... Brewing in progress.",
+        ))
+        .stdout(predicate::str::contains("Your pint is ready. Cheers!"));
 
     Ok(())
 }
 
 #[test]
 fn test_fixes() -> Result<(), Box<dyn std::error::Error>> {
-    let mut cmd = Command::cargo_bin("alescript")?;
+    let mut cmd = Command::new(cargo_bin!("alescript"));
     cmd.arg("examples/test_fixes.ales");
     cmd.assert()
         .success()
@@ -67,7 +69,7 @@ fn test_fixes() -> Result<(), Box<dyn std::error::Error>> {
 
 #[test]
 fn test_full_syntax() -> Result<(), Box<dyn std::error::Error>> {
-    let mut cmd = Command::cargo_bin("alescript")?;
+    let mut cmd = Command::new(cargo_bin!("alescript"));
     cmd.arg("examples/full-syntax-example.ales");
     cmd.assert()
         .success()

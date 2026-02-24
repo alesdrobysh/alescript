@@ -41,10 +41,6 @@ impl Parser {
         self.current = self.tokens.next();
     }
 
-    fn peek(&mut self) -> Option<&Token> {
-        self.tokens.peek()
-    }
-
     fn current_token(&self) -> Result<&Token, ParseError> {
         self.current.as_ref().ok_or_else(|| ParseError {
             message: "Unexpected end of input".to_string(),
@@ -145,7 +141,7 @@ impl Parser {
                 return Err(ParseError::new(
                     "Expected brew name".to_string(),
                     &name_token,
-                ))
+                ));
             }
         };
         self.advance();
@@ -235,7 +231,7 @@ impl Parser {
                 return Err(ParseError::new(
                     "Expected brew name".to_string(),
                     &brew_name_token,
-                ))
+                ));
             }
         };
         self.advance();
@@ -257,7 +253,7 @@ impl Parser {
                 return Err(ParseError::new(
                     "Expected percentage or number".to_string(),
                     &target_token,
-                ))
+                ));
             }
         };
         self.advance();
@@ -287,7 +283,7 @@ impl Parser {
                 return Err(ParseError::new(
                     "Expected brew name".to_string(),
                     &brew_name_token,
-                ))
+                ));
             }
         };
         self.advance();
@@ -315,7 +311,7 @@ impl Parser {
                 return Err(ParseError::new(
                     "Expected brew name".to_string(),
                     &brew_name_token,
-                ))
+                ));
             }
         };
         self.advance();
@@ -334,7 +330,7 @@ impl Parser {
                 return Err(ParseError::new(
                     "Expected brew name".to_string(),
                     &target_token,
-                ))
+                ));
             }
         };
         self.advance();
@@ -348,7 +344,7 @@ impl Parser {
                 return Err(ParseError::new(
                     "Expected brew name".to_string(),
                     &source_token,
-                ))
+                ));
             }
         };
         self.advance();
@@ -368,7 +364,7 @@ impl Parser {
                 return Err(ParseError::new(
                     "Expected brew name".to_string(),
                     &brew_name_token,
-                ))
+                ));
             }
         };
         self.advance();
@@ -391,7 +387,7 @@ impl Parser {
                 return Err(ParseError::new(
                     "Expected brew name".to_string(),
                     &brew_name_token,
-                ))
+                ));
             }
         };
         self.advance();
@@ -414,7 +410,7 @@ impl Parser {
                 return Err(ParseError::new(
                     "Expected identifier".to_string(),
                     &name_token,
-                ))
+                ));
             }
         };
         self.advance();
@@ -438,7 +434,7 @@ impl Parser {
                 return Err(ParseError::new(
                     "Expected recipe name".to_string(),
                     &name_token,
-                ))
+                ));
             }
         };
         self.advance();
@@ -490,7 +486,10 @@ impl Parser {
                             self.skip_whitespace();
 
                             if let Some(next_token) = &self.current {
-                                if matches!(next_token.token_type, TokenType::End | TokenType::Dedent) {
+                                if matches!(
+                                    next_token.token_type,
+                                    TokenType::End | TokenType::Dedent
+                                ) {
                                     return_value = Some(expr);
                                     continue;
                                 } else if next_token.token_type == TokenType::Period {
@@ -541,7 +540,7 @@ impl Parser {
                     return Err(ParseError::new(
                         "Expected parameter name".to_string(),
                         &token,
-                    ))
+                    ));
                 }
             }
 
@@ -611,7 +610,7 @@ impl Parser {
                 return Err(ParseError::new(
                     "Expected identifier in condition".to_string(),
                     &token,
-                ))
+                ));
             }
         };
         self.advance();
@@ -718,7 +717,7 @@ impl Parser {
                 return Err(ParseError::new(
                     "Expected number or percentage".to_string(),
                     &token,
-                ))
+                ));
             }
         };
         self.advance();
@@ -810,7 +809,7 @@ impl Parser {
                         return Err(ParseError::new(
                             "Expected variable name after 'each'".to_string(),
                             &var_token,
-                        ))
+                        ));
                     }
                 };
                 self.advance();
@@ -824,7 +823,7 @@ impl Parser {
                         return Err(ParseError::new(
                             "Expected collection name".to_string(),
                             &collection_token,
-                        ))
+                        ));
                     }
                 };
                 self.advance();
@@ -838,7 +837,7 @@ impl Parser {
                 return Err(ParseError::new(
                     "Expected 'until', 'each', number, or identifier after 'repeat'".to_string(),
                     &token,
-                ))
+                ));
             }
         };
 
@@ -901,7 +900,7 @@ impl Parser {
                 return Err(ParseError::new(
                     "Expected barrel name".to_string(),
                     &name_token,
-                ))
+                ));
             }
         };
         self.advance();
@@ -943,7 +942,7 @@ impl Parser {
                 return Err(ParseError::new(
                     "Expected brew name".to_string(),
                     &brew_name_token,
-                ))
+                ));
             }
         };
         self.advance();
@@ -957,7 +956,7 @@ impl Parser {
                 return Err(ParseError::new(
                     "Expected barrel name".to_string(),
                     &barrel_name_token,
-                ))
+                ));
             }
         };
         self.advance();
@@ -980,7 +979,7 @@ impl Parser {
                 return Err(ParseError::new(
                     "Expected brew name".to_string(),
                     &brew_name_token,
-                ))
+                ));
             }
         };
         self.advance();
@@ -994,7 +993,7 @@ impl Parser {
                 return Err(ParseError::new(
                     "Expected barrel name".to_string(),
                     &barrel_name_token,
-                ))
+                ));
             }
         };
         self.advance();
