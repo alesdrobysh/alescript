@@ -25,7 +25,10 @@ pub fn run_alescript(source: &str) -> String {
     let program = match parser.parse() {
         Ok(prog) => prog,
         Err(err) => {
-            return format!("Parse error at {}:{}: {}", err.line, err.column, err.message);
+            return format!(
+                "Parse error at {}:{}: {}",
+                err.line, err.column, err.message
+            );
         }
     };
 

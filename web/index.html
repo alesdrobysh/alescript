@@ -421,7 +421,7 @@ end.`
         async function initWasm() {
             try {
                 const { default: init, run_alescript } = await import('./pkg/alescript.js');
-                await init();
+                await init('./pkg/alescript_bg.wasm?v=' + Date.now());
                 wasmModule = { run_alescript };
                 document.getElementById('output').innerHTML = '<span class="success">✓ Ready! Enter your code and press Run or Ctrl+Enter.</span>';
                 document.getElementById('status').innerHTML = '✓ Ready';
