@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::time::{SystemTime, UNIX_EPOCH};
 
 /// Represents the state of a single brew
 #[derive(Debug, Clone)]
@@ -54,6 +53,7 @@ pub struct RuntimeEnvironment {
     pub brews: HashMap<String, BrewState>,
     pub variables: HashMap<String, Value>,
     pub barrels: HashMap<String, Vec<Value>>,
+    rng_state: u64,
 }
 
 impl RuntimeEnvironment {
@@ -63,6 +63,7 @@ impl RuntimeEnvironment {
             brews: HashMap::new(),
             variables: HashMap::new(),
             barrels: HashMap::new(),
+            rng_state: 12345,
         }
     }
 
@@ -199,15 +200,14 @@ impl RuntimeEnvironment {
     }
 
     /// Fuzzy comparison with ±10% imprecision
-    pub fn fuzzy_compare(&self, value: f64, threshold: f64, stronger: bool) -> bool {
+    pub fn fuzzy_compare(&mut self, value: f64, threshold: f64, stronger: bool) -> bool {
         let imprecision = value.abs() * 0.1;
 
-        // Simple PRNG using system time
-        let nanos = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap()
-            .as_nanos();
-        let random = ((nanos % 10000) as f64) / 10000.0; // 0.0 to 1.0
+        // Simple xorshift PRNG (works on all platforms including WASM)
+        self.rng_state ^= self.rng_state << 13;
+        self.rng_state ^= self.rng_state >> 7;
+        self.rng_state ^= self.rng_state << 17;
+        let random = (self.rng_state % 10000) as f64 / 10000.0; // 0.0 to 1.0
         let random_offset = (random - 0.5) * 2.0 * imprecision; // -imprecision to +imprecision
 
         let fuzzy_value = value + random_offset;
