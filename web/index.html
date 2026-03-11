@@ -209,7 +209,9 @@
                 <option value="">-- Select an example --</option>
                 <option value="hello">Hello World</option>
                 <option value="fibonacci">Fibonacci Sequence</option>
-                <option value="brewing">Brewing Demo</option>
+                <option value="fizzbuzz">FizzBuzz</option>
+                <option value="powers">Powers of 2</option>
+                <option value="gauss">Gauss Sum</option>
             </select>
             <button id="runButton">▶ Run</button>
         </div>
@@ -257,46 +259,71 @@ end.
 
 toast fibonacci(10).`,
 
-            brewing: `// Example brewing program
+            fizzbuzz: `// FizzBuzz in Alescript
+// Counts from 1 to 15, printing Fizz, Buzz, or FizzBuzz.
+// Since there is no modulo, we track remainders with cycling counters.
 
-// Create a lager with specific ingredients
-brew lager from water, 1 barley, 2 hops, 1 yeast.
+// Create a unit brew and age it to 1% ABV, then keg to freeze it.
+brew one from water, barley.
+age one until 1%.
+keg one.
 
-// Create a stout with different ingredients
-brew stout from water, 2 barley, 1 hops, 1 yeast.
+// Counters (water-only = growth rate 0, stays where we put them)
+brew counter from water.
+brew mod3 from water.
+brew mod5 from water.
+brew zero from water.
 
-// Wait for fermentation
-wait for 2 days.
+repeat 15 times:
+    blend counter with one.
+    blend mod3 with one.
+    blend mod5 with one.
 
-// Check the results
-taste lager.
-taste stout.
+    brew flag from water.
 
-// Age the lager to perfection
-age lager until 10%.
+    if mod3 is 3%:
+        toast "Fizz".
+        relabel mod3 as zero.
+        blend flag with one.
+    end.
 
-// Keg it to stop growth
-keg lager.
+    if mod5 is 5%:
+        toast "Buzz".
+        relabel mod5 as zero.
+        blend flag with one.
+    end.
 
-// Wait more - lager should stay at 10%, stout will continue growing
-wait for 2 days.
+    if flag is 0%:
+        taste counter.
+    end.
+end.`,
 
-// Blend brews together
-blend lager with stout.
+            powers: `// Powers of 2
+// Fortify doubles a brew's ABV each iteration.
+brew power from water, barley.
+age power until 1%.
 
-// Judge the strength
-judge if lager is stronger than 5.0%:
-    toast "strong brew!".
-else:
-    toast "mild brew.".
+repeat 10 times:
+    fortify power by 2.
+    taste power.
+end.`,
+
+            gauss: `// Gauss Sum: 1 + 2 + 3 + ... + 10 = 55
+// Blend adds one brew's ABV into another.
+brew one from water, barley.
+age one until 1%.
+keg one.
+
+brew counter from water.
+brew sum from water.
+
+repeat 10 times:
+    blend counter with one.
+    blend sum with counter.
 end.
 
-// Create a barrel of brews
-barrel taplist = [lager, stout].
-
-repeat each beer in taplist:
-    taste beer.
-end.`
+toast "Sum of 1 to 10:".
+taste sum.`
         };
 
         // Monaco Editor instance
