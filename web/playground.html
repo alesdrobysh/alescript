@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>alescript Playground</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/editor/editor.main.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        h1 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+        }
+
+        .logo em {
+            font-style: normal;
+            color: var(--accent);
+        }
+
+        .home-link {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .home-link:hover {
+            color: var(--accent);
+        }
+
+        .subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .controls label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .controls select {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-size: 13px;
+            cursor: pointer;
+            min-width: 200px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .controls select:hover {
+            border-color: var(--accent);
+        }
+
+        .controls select:focus {
+            border-color: var(--accent);
+        }
+
+        .controls button {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 6px;
+            background: var(--accent);
+            color: var(--bg-primary);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .controls button:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .controls button:active {
+            transform: translateY(0);
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border);
+        }
+
+        .panel:last-child {
+            border-right: none;
+        }
+
+        .panel-header {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            padding: 10px 16px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #editor-container {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        #output {
+            flex: 1;
+            padding: 16px;
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            background: var(--bg-code);
+            color: var(--text-primary);
+        }
+
+        #output::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        #output::-webkit-scrollbar-track {
+            background: var(--bg-code);
+        }
+
+        #output::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 5px;
+        }
+
+        #output::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+
+        .loading {
+            color: var(--accent);
+            font-style: italic;
+        }
+
+        .error {
+            color: #ff6b6b;
+        }
+
+        .success {
+            color: #51cf66;
+        }
+
+        .status-bar {
+            background: var(--accent);
+            color: var(--bg-primary);
+            padding: 6px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <a href="index.html" class="home-link">← Back to Home</a>
+            <h1><span class="logo">🍺</span> ale<em>script</em> Playground</h1>
+            <span class="subtitle">A brewing-themed programming language</span>
+        </div>
+        <div class="controls">
+            <label for="examples">Examples:</label>
+            <select id="examples">
+                <option value="">-- Select an example --</option>
+                <option value="hello">Hello World</option>
+                <option value="fibonacci">Fibonacci Sequence</option>
+                <option value="fizzbuzz">FizzBuzz</option>
+                <option value="powers">Powers of 2</option>
+                <option value="gauss">Gauss Sum</option>
+            </select>
+            <button id="runButton">▶ Run</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="panel">
+            <div class="panel-header">📝 Code Editor</div>
+            <div id="editor-container"></div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">📤 Output</div>
+            <div id="output">Click "Run" to execute your code...</div>
+        </div>
+    </div>
+
+    <div class="status-bar">
+        <span id="status">⏳ Loading...</span>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
+    <script type="module">
+        const examples = {
+            hello: `// Hello World in alescript
+toast "hello, world!".`,
+
+            fibonacci: `// Fibonacci sequence in alescript
+
+recipe fibonacci(n)
+    brew a from water.
+    brew b from water, barley.
+    wait for 1 day.
+    brew temp from water.
+
+    repeat n times:
+        relabel temp as a.
+        relabel a as b.
+        blend b with temp.
+    end.
+
+    a
+end.
+
+toast fibonacci(10).`,
+
+            fizzbuzz: `// FizzBuzz in Alescript
+// Counts from 1 to 15, printing Fizz, Buzz, or FizzBuzz.
+// Since there is no modulo, we track remainders with cycling counters.
+
+// Create a unit brew and age it to 1% ABV, then keg to freeze it.
+brew one from water, barley.
+age one until 1%.
+keg one.
+
+// Counters (water-only = growth rate 0, stays where we put them)
+brew counter from water.
+brew mod3 from water.
+brew mod5 from water.
+brew zero from water.
+
+repeat 15 times:
+    blend counter with one.
+    blend mod3 with one.
+    blend mod5 with one.
+
+    brew flag from water.
+
+    if mod3 is 3%:
+        toast "Fizz".
+        relabel mod3 as zero.
+        blend flag with one.
+    end.
+
+    if mod5 is 5%:
+        toast "Buzz".
+        relabel mod5 as zero.
+        blend flag with one.
+    end.
+
+    if flag is 0%:
+        taste counter.
+    end.
+end.`,
+
+            powers: `// Powers of 2
+// Fortify doubles a brew's ABV each iteration.
+brew power from water, barley.
+age power until 1%.
+
+repeat 10 times:
+    fortify power by 2.
+    taste power.
+end.`,
+
+            gauss: `// Gauss Sum: 1 + 2 + 3 + ... + 10 = 55
+// Blend adds one brew's ABV into another.
+brew one from water, barley.
+age one until 1%.
+keg one.
+
+brew counter from water.
+brew sum from water.
+
+repeat 10 times:
+    blend counter with one.
+    blend sum with counter.
+end.
+
+toast "Sum of 1 to 10:".
+taste sum.`
+        };
+
+        let editor = null;
+        let wasmModule = null;
+
+        require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs' } });
+
+        require(['vs/editor/editor.main'], function() {
+            monaco.languages.register({ id: 'alescript' });
+
+            monaco.languages.setMonarchTokensProvider('alescript', {
+                keywords: [
+                    'recipe', 'end', 'brew', 'from', 'wait', 'for', 'relabel', 'as',
+                    'mix', 'with', 'repeat', 'times', 'each', 'in', 'toast', 'taste',
+                    'age', 'until', 'keg', 'judge', 'if', 'is', 'than', 'else',
+                    'barrel', 'stronger', 'weaker', 'day', 'days', 'water', 'barley',
+                    'hops', 'yeast'
+                ],
+
+                operators: [
+                    '=', '>', '<', '+', '-', '*', '/'
+                ],
+
+                symbols: /[=><!~?:&|+\-*\/\^%]+/,
+
+                tokenizer: {
+                    root: [
+                        [/[a-z_$][\w$]*/, {
+                            cases: {
+                                '@keywords': 'keyword',
+                                '@default': 'identifier'
+                            }
+                        }],
+
+                        { include: '@whitespace' },
+
+                        [/\d*\.\d+([eE][\-+]?\d+)?/, 'number.float'],
+                        [/\d+/, 'number'],
+
+                        [/"([^"\\]|\\.)*$/, 'string.invalid'],
+                        [/"/, 'string', '@string'],
+
+                        [/[{}()\[\]]/, '@brackets'],
+                        [/[<>](?!@symbols)/, '@brackets'],
+                        [/@symbols/, {
+                            cases: {
+                                '@operators': 'operator',
+                                '@default': ''
+                            }
+                        }],
+
+                        [/[;,.]/, 'delimiter'],
+                    ],
+
+                    whitespace: [
+                        [/[ \t\r\n]+/, 'white'],
+                        [/\/\/.*$/, 'comment'],
+                    ],
+
+                    string: [
+                        [/[^\\"]+/, 'string'],
+                        [/\\./, 'string.escape'],
+                        [/"/, 'string', '@pop']
+                    ],
+                }
+            });
+
+            monaco.editor.defineTheme('alescript-dark', {
+                base: 'vs-dark',
+                inherit: true,
+                rules: [
+                    { token: 'keyword', foreground: 'ff9f43', fontStyle: 'bold' },
+                    { token: 'identifier', foreground: 'f0e6d3' },
+                    { token: 'number', foreground: 'a8e6cf' },
+                    { token: 'string', foreground: '51cf66' },
+                    { token: 'comment', foreground: '5c5c5c', fontStyle: 'italic' },
+                    { token: 'operator', foreground: 'f0e6d3' },
+                ],
+                colors: {
+                    'editor.background': '#121212',
+                    'editor.foreground': '#f0e6d3',
+                    'editor.lineHighlightBackground': '#1a1a1a',
+                    'editor.selectionBackground': '#2a241e',
+                    'editorCursor.foreground': '#f5a623',
+                    'editorLineNumber.foreground': '#6b5f4f',
+                    'editorLineNumber.activeForeground': '#a89a8a',
+                }
+            });
+
+            editor = monaco.editor.create(document.getElementById('editor-container'), {
+                value: examples.hello,
+                language: 'alescript',
+                theme: 'alescript-dark',
+                automaticLayout: true,
+                fontSize: 14,
+                fontFamily: "'SF Mono', 'Fira Code', 'Consolas', monospace",
+                minimap: { enabled: true },
+                scrollBeyondLastLine: false,
+                lineNumbers: 'on',
+                renderWhitespace: 'selection',
+                tabSize: 4,
+                insertSpaces: true,
+            });
+
+            editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, runCode);
+
+            document.getElementById('status').innerHTML = '✓ Monaco Editor loaded';
+
+            initWasm();
+        });
+
+        async function initWasm() {
+            try {
+                const { default: init, run_alescript } = await import('./pkg/alescript.js');
+                await init('./pkg/alescript_bg.wasm?v=' + Date.now());
+                wasmModule = { run_alescript };
+                document.getElementById('output').innerHTML = '<span class="success">✓ Ready! Enter your code and press Run or Ctrl+Enter.</span>';
+                document.getElementById('status').innerHTML = '✓ Ready';
+            } catch (error) {
+                document.getElementById('output').innerHTML = `<span class="error">Error loading WebAssembly module:\n${error.message}\n\nMake sure to build the project first with:\nwasm-pack build --target web --out-dir web/pkg</span>`;
+                document.getElementById('status').innerHTML = '✗ Error loading WebAssembly';
+            }
+        }
+
+        function runCode() {
+            if (!wasmModule) {
+                document.getElementById('output').innerHTML = '<span class="error">WebAssembly module not loaded yet. Please wait...</span>';
+                return;
+            }
+
+            if (!editor) {
+                document.getElementById('output').innerHTML = '<span class="error">Editor not initialized yet. Please wait...</span>';
+                return;
+            }
+
+            const code = editor.getValue();
+            const outputDiv = document.getElementById('output');
+
+            outputDiv.innerHTML = '<span class="loading">Running...</span>';
+            document.getElementById('status').innerHTML = '⏳ Running...';
+
+            setTimeout(() => {
+                try {
+                    const result = wasmModule.run_alescript(code);
+                    outputDiv.textContent = result || '(no output)';
+                    outputDiv.className = '';
+                    document.getElementById('status').innerHTML = '✓ Execution completed';
+                } catch (error) {
+                    outputDiv.innerHTML = `<span class="error">Error:\n${error.message}</span>`;
+                    document.getElementById('status').innerHTML = '✗ Execution failed';
+                }
+            }, 10);
+        }
+
+        document.getElementById('runButton').addEventListener('click', runCode);
+
+        document.getElementById('examples').addEventListener('change', (e) => {
+            const example = e.target.value;
+            if (example && examples[example] && editor) {
+                editor.setValue(examples[example]);
+            }
+        });
+    </script>
+</body>
+</html>

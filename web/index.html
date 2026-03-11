@@ -3,502 +3,986 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alescript Playground</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/editor/editor.main.css">
+    <title>alescript - A Brewing-Themed Programming Language</title>
+    <link rel="stylesheet" href="styles.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #1e1e1e;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            color: #d4d4d4;
-        }
-
-        header {
-            background: #2d2d30;
-            border-bottom: 1px solid #3e3e42;
-            padding: 12px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        h1 {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #cccccc;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-        }
-
-        .subtitle {
-            font-size: 0.85rem;
-            color: #858585;
-        }
-
-        .controls {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-
-        .controls label {
-            font-size: 0.85rem;
-            color: #cccccc;
-        }
-
-        .controls select {
-            padding: 6px 10px;
-            border: 1px solid #3e3e42;
-            border-radius: 3px;
-            background: #3c3c3c;
-            color: #cccccc;
-            font-size: 13px;
-            cursor: pointer;
-            min-width: 200px;
-            outline: none;
-        }
-
-        .controls select:hover {
-            background: #4e4e4e;
-        }
-
-        .controls select:focus {
-            border-color: #007acc;
-        }
-
-        .controls button {
-            padding: 6px 16px;
-            border: none;
-            border-radius: 3px;
-            background: #0e639c;
-            color: white;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .controls button:hover {
-            background: #1177bb;
-        }
-
-        .controls button:active {
-            background: #0d5a8f;
+            line-height: 1.6;
         }
 
         .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Navigation */
+        nav {
+            background: rgba(10, 10, 10, 0.95);
+            border-bottom: 1px solid var(--border);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        nav .container {
             display: flex;
-            flex: 1;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+            font-family: 'CameraPlainVariable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .logo .beer-icon {
+            color: var(--accent);
+            width: 20px;
+            height: 20px;
+        }
+
+        .logo .ale {
+            background: linear-gradient(135deg, #f5b13d, #d6741f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-style: italic;
+            font-family: 'Instrument Serif', serif;
+        }
+
+        .logo .script {
+            color: var(--text-primary);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .nav-links .btn {
+            background: var(--accent);
+            color: #0a0a0a;
+            padding: 6px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .nav-links .btn:hover {
+            filter: brightness(1.1);
+            color: #0a0a0a !important;
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            padding: 160px 0 100px;
+            text-align: center;
             overflow: hidden;
         }
 
-        .panel {
-            flex: 1;
+        .hero-grid {
+            position: absolute;
+            inset: 0;
+            opacity: 0.03;
+            background-image:
+                linear-gradient(var(--text-primary) 1px, transparent 1px),
+                linear-gradient(90deg, var(--text-primary) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+        }
+
+        .hero-glow {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px;
+            height: 600px;
+            background: radial-gradient(ellipse, rgba(245, 166, 35, 0.04) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .hero .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero .version {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(245, 166, 35, 0.06);
+            border: 1px solid rgba(245, 166, 35, 0.2);
+            padding: 6px 16px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-family: 'SF Mono', monospace;
+            color: var(--accent);
+            letter-spacing: 0.05em;
+            margin-bottom: 40px;
+        }
+
+        .hero .version .pulse {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .hero h1 {
+            font-size: 6rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 0.85;
+            margin-bottom: 24px;
+            font-family: 'CameraPlainVariable', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .hero h1 .ale {
+            background: linear-gradient(135deg, #f5b13d, #d6741f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-style: italic;
+            letter-spacing: 0.02em;
+            font-weight: 400;
+            font-family: 'Instrument Serif', serif;
+        }
+
+        .hero h1 .script {
+            color: var(--text-primary);
+            font-weight: 700;
+            font-family: 'CameraPlainVariable', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 4rem;
+            }
+        }
+
+        .hero .tagline {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 500px;
+            margin: 0 auto 48px;
+            line-height: 1.625;
+        }
+
+        .hero .tagline .ferment {
+            font-style: italic;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .hero .tagline .brew {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .hero-code {
+            background: var(--bg-code);
+            border: 1px solid rgba(245, 166, 35, 0.15);
+            border-radius: 12px;
+            padding: 16px 24px;
+            display: inline-block;
+            text-align: left;
+            margin-bottom: 48px;
+            position: relative;
+            box-shadow: 0 0 30px rgba(245, 166, 35, 0.1);
+        }
+
+        .hero-code code {
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 0.875rem;
+            color: rgba(240, 230, 211, 0.8);
+        }
+
+        .hero-code .keyword, code .k {
+            color: var(--accent);
+        }
+
+        .hero-code .string, code .s {
+            color: var(--text-primary);
+        }
+
+        code .c {
+            color: var(--text-muted);
+        }
+
+        /* Concept card code styling */
+        .concept-card code {
+            color: rgba(240, 230, 211, 0.7);
+        }
+
+        .concept-card code .k {
+            color: var(--accent);
+        }
+
+        .concept-card code .s {
+            color: var(--text-primary);
+        }
+
+        .concept-card code .c {
+            color: var(--text-muted);
+        }
+
+        .hero .cta-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: var(--bg-primary);
+            border-radius: 12px;
+            padding: 12px 32px;
+            font-weight: 600;
+            box-shadow: 0 0 20px rgba(245, 166, 35, 0.25);
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            filter: brightness(1.1);
+            box-shadow: 0 0 30px rgba(245, 166, 35, 0.4);
+            transform: translateY(0);
+        }
+
+        .btn-primary span {
+            transition: transform 0.2s;
+        }
+
+        .btn-primary:hover span {
+            transform: translateX(2px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: rgba(240, 230, 211, 0.8);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 32px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: var(--bg-secondary);
+        }
+
+        /* Section Styles */
+        section {
+            padding: 100px 0;
+        }
+
+        .section-label {
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            color: var(--accent);
+            margin-bottom: 16px;
+            font-family: 'SF Mono', monospace;
+            text-transform: uppercase;
+        }
+
+        section h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        section > .container > p {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 1.15rem;
+            max-width: 700px;
+            margin: 0 auto 60px;
+        }
+
+        /* Concepts Grid */
+        .concepts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        .concept-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.5s;
+            position: relative;
+        }
+
+        .concept-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 16px;
+            background: rgba(245, 166, 35, 0.02);
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .concept-card:hover {
+            border-color: rgba(245, 166, 35, 0.2);
+            transform: translateY(0);
+        }
+
+        .concept-card:hover::before {
+            opacity: 1;
+        }
+
+        .concept-card .icon {
+            font-size: 2rem;
+            margin-bottom: 16px;
+        }
+
+        .concept-card h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            transition: color 0.3s;
+        }
+
+        .concept-card:hover h3 {
+            color: var(--accent);
+        }
+
+        .concept-card p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 20px;
+            line-height: 1.625;
+        }
+
+        .concept-card code {
+            display: block;
+            background: var(--bg-code);
+            border-radius: 8px;
+            padding: 14px;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 0.75rem;
+            color: rgba(240, 230, 211, 0.7);
+            overflow-x: auto;
+        }
+
+        /* Operators Table */
+        .operators-section {
+            background: var(--bg-secondary);
+        }
+
+        .operators-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(17, 17, 17, 0.3);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(37, 37, 37, 0.6);
+        }
+
+        .operators-table th,
+        .operators-table td {
+            padding: 20px 24px;
+            text-align: left;
+            border-bottom: 1px solid rgba(37, 37, 37, 0.4);
+        }
+
+        .operators-table th {
+            background: transparent;
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 0.688rem;
+            font-family: 'SF Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+        }
+
+        .operators-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .operators-table tbody tr {
+            transition: background 0.3s;
+        }
+
+        .operators-table tbody tr:hover {
+            background: rgba(245, 166, 35, 0.03);
+        }
+
+        .operators-table .op {
+            font-family: 'SF Mono', monospace;
+            font-size: 1.125rem;
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .operators-table .metaphor {
+            font-family: 'SF Mono', monospace;
+            font-size: 0.875rem;
+            color: rgba(240, 230, 211, 0.9);
+            font-weight: 500;
+        }
+
+        .operators-table .desc {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .operators-table code {
+            background: var(--bg-code);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: rgba(240, 230, 211, 0.7);
+        }
+
+        @media (max-width: 768px) {
+            .operators-table .desc {
+                display: none;
+            }
+        }
+
+        /* Code Samples */
+        .samples-grid {
             display: flex;
             flex-direction: column;
-            border-right: 1px solid #3e3e42;
+            gap: 48px;
+            max-width: 800px;
+            margin: 0 auto;
         }
 
-        .panel:last-child {
-            border-right: none;
-        }
-
-        .panel-header {
-            background: #2d2d30;
-            color: #cccccc;
-            padding: 8px 15px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            border-bottom: 1px solid #3e3e42;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        #editor-container {
-            flex: 1;
+        .sample-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
             overflow: hidden;
         }
 
-        #output {
-            flex: 1;
-            padding: 15px;
-            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-            font-size: 13px;
-            line-height: 1.6;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            background: #1e1e1e;
-            color: #d4d4d4;
+        .sample-header {
+            background: var(--bg-code);
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        #output::-webkit-scrollbar {
-            width: 10px;
+        .sample-header .number {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: rgba(245, 166, 35, 0.6);
+            width: 24px;
         }
 
-        #output::-webkit-scrollbar-track {
-            background: #1e1e1e;
+        .sample-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
         }
 
-        #output::-webkit-scrollbar-thumb {
-            background: #424242;
-            border-radius: 5px;
-        }
-
-        #output::-webkit-scrollbar-thumb:hover {
-            background: #4e4e4e;
-        }
-
-        .loading {
-            color: #4fc3f7;
-            font-style: italic;
-        }
-
-        .error {
-            color: #f48771;
-        }
-
-        .success {
-            color: #89d185;
-        }
-
-        .status-bar {
-            background: #007acc;
-            color: white;
-            padding: 4px 15px;
-            font-size: 12px;
+        .sample-filename {
+            margin-left: auto;
+            font-family: 'SF Mono', monospace;
+            font-size: 0.688rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
             display: flex;
             align-items: center;
             gap: 8px;
+        }
+
+        .sample-filename::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(245, 166, 35, 0.3);
+        }
+
+        .sample-code {
+            padding: 20px;
+            background: var(--bg-tertiary);
+        }
+
+        .sample-code pre {
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 0.875rem;
+            line-height: 1.75;
+            color: rgba(240, 230, 211, 0.8);
+            white-space: pre-wrap;
+        }
+
+        .sample-code pre .k {
+            color: var(--accent);
+        }
+
+        .sample-code pre .s {
+            color: var(--text-primary);
+        }
+
+        .sample-code pre .c {
+            color: var(--text-muted);
+        }
+
+        /* Philosophy Section */
+        .philosophy-section {
+            background: var(--bg-secondary);
+        }
+
+        .philosophy-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 32px;
+        }
+
+        .philosophy-item {
+            text-align: left;
+            padding: 24px;
+            background: rgba(17, 17, 17, 0.4);
+            border: 1px solid rgba(37, 37, 37, 0.5);
+            border-radius: 16px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .philosophy-item:hover {
+            border-color: rgba(245, 166, 35, 0.15);
+        }
+
+        .philosophy-item .icon {
+            font-size: 1.5rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: rgba(245, 166, 35, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .philosophy-item h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            margin-top: 0;
+        }
+
+        .philosophy-item p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin: 0;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            text-align: center;
+            padding: 120px 0;
+            background: radial-gradient(ellipse at bottom, rgba(245, 166, 35, 0.1) 0%, transparent 60%);
+        }
+
+        .cta-section h2 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .cta-section p {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        /* Quick Start */
+        .quickstart-section {
+            background: var(--bg-secondary);
+        }
+
+        .terminal {
+            background: var(--bg-code);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .terminal-header {
+            background: var(--bg-tertiary);
+            padding: 12px 20px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .terminal-header .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .terminal-header .dot:nth-child(1) { background: #ff5f57; }
+        .terminal-header .dot:nth-child(2) { background: #febc2e; }
+        .terminal-header .dot:nth-child(3) { background: #28c840; }
+
+        .terminal-body {
+            padding: 24px;
+        }
+
+        .terminal-body pre {
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 1rem;
+            line-height: 1.8;
+            color: var(--text-primary);
+        }
+
+        .terminal-body .prompt {
+            color: var(--accent);
+        }
+
+        .terminal-body .cmd {
+            color: var(--text-primary);
+        }
+
+        .terminal-body .comment {
+            color: var(--text-muted);
+        }
+
+        /* Footer */
+        footer {
+            padding: 40px 0;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 3rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            section h2 {
+                font-size: 2rem;
+            }
+
+            .operators-table {
+                font-size: 0.9rem;
+            }
+
+            .operators-table th,
+            .operators-table td {
+                padding: 16px 12px;
+            }
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="header-left">
-            <h1><span class="logo">🍺</span> Alescript Playground</h1>
-            <span class="subtitle">A brewing-themed programming language</span>
+    <nav>
+        <div class="container">
+            <a href="index.html" class="logo">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="beer-icon"><path d="M17 11h1a3 3 0 0 1 0 6h-1"></path><path d="M9 12v6"></path><path d="M13 12v6"></path><path d="M14 7.5c-1 0-1.44.5-3 .5s-2-.5-3-.5-1.72.5-2.5.5a2.5 2.5 0 0 1 0-5c.78 0 1.57.5 2.5.5S9.44 2 11 2s2 1.5 3 1.5 1.72-.5 2.5-.5a2.5 2.5 0 0 1 0 5c-.78 0-1.5-.5-2.5-.5Z"></path><path d="M5 8v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8"></path></svg>
+                <span><span class="ale">ale</span><span class="script">script</span></span>
+            </a>
+            <div class="nav-links">
+                <a href="#concepts">Concepts</a>
+                <a href="#examples">Examples</a>
+                <a href="#arithmetic">Arithmetic</a>
+                <a href="https://github.com/alesdrobysh/alescript" target="_blank">GitHub</a>
+                <a href="playground.html" class="btn">Try Online →</a>
+            </div>
         </div>
-        <div class="controls">
-            <label for="examples">Examples:</label>
-            <select id="examples">
-                <option value="">-- Select an example --</option>
-                <option value="hello">Hello World</option>
-                <option value="fibonacci">Fibonacci Sequence</option>
-                <option value="fizzbuzz">FizzBuzz</option>
-                <option value="powers">Powers of 2</option>
-                <option value="gauss">Gauss Sum</option>
-            </select>
-            <button id="runButton">▶ Run</button>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-grid"></div>
+        <div class="hero-glow"></div>
+        <div class="container">
+            <span class="version"><span class="pulse"></span>v1.0 — Now Brewing</span>
+            <h1><span class="ale">ale</span><span class="script">script</span></h1>
+            <p class="tagline">
+                A language that <span class="ferment">ferments</span> ideas into reality. Think like a brewmaster, code like a poet.
+            </p>
+            <div class="hero-code">
+                <code>
+                    <span class="keyword">brew</span> <span class="string">hello</span> <span class="keyword">from</span> water, barley, hops, yeast.
+                </code>
+            </div>
+            <div class="cta-buttons">
+                <a href="playground.html" class="btn btn-primary"><span>Try it Online</span><span> →</span></a>
+                <a href="https://github.com/alesdrobysh/alescript" class="btn btn-secondary">View on GitHub</a>
+            </div>
         </div>
-    </header>
+    </section>
 
-    <div class="container">
-        <div class="panel">
-            <div class="panel-header">📝 Code Editor</div>
-            <div id="editor-container"></div>
+    <section id="concepts">
+        <div class="container">
+            <p class="section-label">Language Primitives</p>
+            <h2>Core Concepts</h2>
+            <p>Everything in alescript maps to the art of brewing. Think like a brewmaster.</p>
+
+            <div class="concepts-grid">
+                <div class="concept-card">
+                    <div class="icon">🌾</div>
+                    <h3>Brews &amp; Ingredients</h3>
+                    <p>Variables are brewing ingredients. Water, barley, hops, and yeast each contribute to growth rate.</p>
+                    <code><span class="k">brew</span> lager <span class="k">from</span> water, 1 barley, 2 hops, 1 yeast.</code>
+                </div>
+                <div class="concept-card">
+                    <div class="icon">⏳</div>
+                    <h3>Fermentation</h3>
+                    <p>Values don't compute instantly — they ferment over time, forcing strategic thinking.</p>
+                    <code><span class="k">wait</span> <span class="k">for</span> 5 days.<br><span class="k">taste</span> lager. <span class="c">// "12.5% ABV"</span></code>
+                </div>
+                <div class="concept-card">
+                    <div class="icon">🎯</div>
+                    <h3>Aging</h3>
+                    <p>Need exact values? Let your brew mature to a precise ABV.</p>
+                    <code><span class="k">age</span> lager <span class="k">until</span> 5.2%.</code>
+                </div>
+                <div class="concept-card">
+                    <div class="icon">🍻</div>
+                    <h3>Beer Arithmetic</h3>
+                    <p>Blend, fortify, and filter — math expressed through brewing metaphors.</p>
+                    <code><span class="k">blend</span> ipa <span class="k">with</span> stout.<br><span class="k">fortify</span> porter <span class="k">by</span> 3.<br><span class="k">filter</span> ipa <span class="k">by</span> 2.</code>
+                </div>
+                <div class="concept-card">
+                    <div class="icon">📜</div>
+                    <h3>Recipes</h3>
+                    <p>Functions are recipes. The last line is the return value.</p>
+                    <code><span class="k">recipe</span> my_pilsner()<br>&nbsp;&nbsp;<span class="k">brew</span> pilsner <span class="k">from</span> water, barley.<br>&nbsp;&nbsp;<span class="k">age</span> pilsner <span class="k">until</span> 4.8%.<br>&nbsp;&nbsp;pilsner<br><span class="k">end</span>.</code>
+                </div>
+                <div class="concept-card">
+                    <div class="icon">🧪</div>
+                    <h3>Brewmaster's Judgment</h3>
+                    <p>Conditionals use the brewmaster's intuition — comparisons have ±10% imprecision!</p>
+                    <code><span class="k">judge</span> <span class="k">if</span> lager <span class="k">is</span> stronger <span class="k">than</span> 5.0%:<br>&nbsp;&nbsp;<span class="k">toast</span> <span class="s">"a strong lager!"</span><br><span class="k">end</span>.</code>
+                </div>
+            </div>
         </div>
+    </section>
 
-        <div class="panel">
-            <div class="panel-header">📤 Output</div>
-            <div id="output">Click "Run" to execute your code...</div>
+    <section id="arithmetic" class="operators-section">
+        <div class="container">
+            <p class="section-label">Operators</p>
+            <h2>Beer Arithmetic</h2>
+            <p>There is no subtraction in alescript. Seriously, how would that even work?</p>
+
+            <table class="operators-table">
+                <thead>
+                    <tr>
+                        <th>OP</th>
+                        <th>METAPHOR</th>
+                        <th>DESCRIPTION</th>
+                        <th>EXAMPLE</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="op">+</td>
+                        <td class="metaphor">blend</td>
+                        <td class="desc">Blending two brews together</td>
+                        <td><code><span class="k">blend</span> lager <span class="k">with</span> stout.</code></td>
+                    </tr>
+                    <tr>
+                        <td class="op">×</td>
+                        <td class="metaphor">fortify</td>
+                        <td class="desc">Scaling up the brew</td>
+                        <td><code><span class="k">fortify</span> porter <span class="k">by</span> 3.</code></td>
+                    </tr>
+                    <tr>
+                        <td class="op">÷</td>
+                        <td class="metaphor">filter</td>
+                        <td class="desc">Weakening a beer with water</td>
+                        <td><code><span class="k">filter</span> ipa <span class="k">by</span> 2.</code></td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-    </div>
+    </section>
 
-    <div class="status-bar">
-        <span id="status">⏳ Loading...</span>
-    </div>
+    <section id="examples">
+        <div class="container">
+            <p class="section-label">Code Samples</p>
+            <h2>See it in Action</h2>
 
-    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
-    <script type="module">
-        // Examples database
-        const examples = {
-            hello: `// Hello World in alescript
-toast "hello, world!".`,
+            <div class="samples-grid">
+                <div class="sample-card">
+                    <div class="sample-header">
+                        <span class="number">01</span>
+                        <h3>Hello, World!</h3>
+                        <span class="sample-filename">hello.ales</span>
+                    </div>
+                    <div class="sample-code">
+                        <pre><span class="k">toast</span> <span class="s">"hello, world!"</span>.</pre>
+                    </div>
+                </div>
+                <div class="sample-card">
+                    <div class="sample-header">
+                        <span class="number">02</span>
+                        <h3>Brewing a Perfect Lager</h3>
+                        <span class="sample-filename">lager.ales</span>
+                    </div>
+                    <div class="sample-code">
+                        <pre><span class="k">brew</span> lager <span class="k">from</span> water, barley, hops, yeast.
 
-            fibonacci: `// Fibonacci sequence in alescript
+<span class="k">age</span> lager <span class="k">until</span> 5.2%.
+<span class="k">keg</span> lager.
 
-recipe fibonacci(n)
-    brew a from water.
-    brew b from water, barley.
-    wait for 1 day.
-    brew temp from water.
+<span class="k">wait</span> <span class="k">for</span> 3 days.
+<span class="k">taste</span> lager. <span class="c">// "5.2% ABV" — perfectly preserved</span></pre>
+                    </div>
+                </div>
+                <div class="sample-card">
+                    <div class="sample-header">
+                        <span class="number">03</span>
+                        <h3>Fibonacci Sequence</h3>
+                        <span class="sample-filename">fibonacci.ales</span>
+                    </div>
+                    <div class="sample-code">
+                        <pre><span class="k">recipe</span> fibonacci(n)
+    <span class="k">brew</span> a <span class="k">from</span> water, barley.
+    <span class="k">wait</span> <span class="k">for</span> 1 day.
+    <span class="k">brew</span> b <span class="k">from</span> water, barley.
+    <span class="k">brew</span> temp <span class="k">from</span> water.
 
-    repeat n times:
-        relabel temp as a.
-        relabel a as b.
-        blend b with temp.
-    end.
+    <span class="k">if</span> n <span class="k">is</span> 0:
+        b
+    <span class="k">else</span>:
+        <span class="k">repeat</span> n <span class="k">times</span>:
+            <span class="k">relabel</span> temp <span class="k">as</span> a.
+            <span class="k">blend</span> a <span class="k">with</span> b.
+            <span class="k">relabel</span> b <span class="k">as</span> a.
+            <span class="k">relabel</span> a <span class="k">as</span> temp.
+        b
+    <span class="k">end</span>.
+<span class="k">end</span>.
 
-    a
-end.
+<span class="k">toast</span> fibonacci(10). <span class="c">// "55% ABV"</span></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-toast fibonacci(10).`,
+    <section id="philosophy" class="philosophy-section">
+        <div class="container">
+            <p class="section-label">Philosophy</p>
+            <h2>Why alescript?</h2>
 
-            fizzbuzz: `// FizzBuzz in Alescript
-// Counts from 1 to 15, printing Fizz, Buzz, or FizzBuzz.
-// Since there is no modulo, we track remainders with cycling counters.
+            <div class="philosophy-grid">
+                <div class="philosophy-item">
+                    <div class="icon">✦</div>
+                    <h3>Readable &amp; Expressive</h3>
+                    <p>Every line of alescript feels like poetry.</p>
+                </div>
+                <div class="philosophy-item">
+                    <div class="icon">◎</div>
+                    <h3>Time-Oriented Execution</h3>
+                    <p>Instead of instant results, computations "brew" over time.</p>
+                </div>
+                <div class="philosophy-item">
+                    <div class="icon">◆</div>
+                    <h3>Metaphor-Driven</h3>
+                    <p>Every operation tells a story.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-// Create a unit brew and age it to 1% ABV, then keg to freeze it.
-brew one from water, barley.
-age one until 1%.
-keg one.
+    <section class="cta-section">
+        <div class="container">
+            <h2>Start Brewing Code</h2>
+            <p>alescript isn't just a language — it's a philosophy of brewing code with patience and mastery.</p>
+            <div class="cta-buttons">
+                <a href="playground.html" class="btn btn-primary">Try it Online →</a>
+                <a href="https://github.com/alesdrobysh/alescript" class="btn btn-secondary">View on GitHub</a>
+            </div>
+        </div>
+    </section>
 
-// Counters (water-only = growth rate 0, stays where we put them)
-brew counter from water.
-brew mod3 from water.
-brew mod5 from water.
-brew zero from water.
+    <section class="quickstart-section">
+        <div class="container">
+            <p class="section-label"># Quick start</p>
 
-repeat 15 times:
-    blend counter with one.
-    blend mod3 with one.
-    blend mod5 with one.
+            <div class="terminal">
+                <div class="terminal-header">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+                <div class="terminal-body">
+                    <pre><span class="prompt">$</span> <span class="cmd">git clone https://github.com/alesdrobysh/alescript.git</span>
+<span class="prompt">$</span> <span class="cmd">cd alescript</span>
+<span class="prompt">$</span> <span class="cmd">cargo build --release</span></pre>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    brew flag from water.
-
-    if mod3 is 3%:
-        toast "Fizz".
-        relabel mod3 as zero.
-        blend flag with one.
-    end.
-
-    if mod5 is 5%:
-        toast "Buzz".
-        relabel mod5 as zero.
-        blend flag with one.
-    end.
-
-    if flag is 0%:
-        taste counter.
-    end.
-end.`,
-
-            powers: `// Powers of 2
-// Fortify doubles a brew's ABV each iteration.
-brew power from water, barley.
-age power until 1%.
-
-repeat 10 times:
-    fortify power by 2.
-    taste power.
-end.`,
-
-            gauss: `// Gauss Sum: 1 + 2 + 3 + ... + 10 = 55
-// Blend adds one brew's ABV into another.
-brew one from water, barley.
-age one until 1%.
-keg one.
-
-brew counter from water.
-brew sum from water.
-
-repeat 10 times:
-    blend counter with one.
-    blend sum with counter.
-end.
-
-toast "Sum of 1 to 10:".
-taste sum.`
-        };
-
-        // Monaco Editor instance
-        let editor = null;
-        let wasmModule = null;
-
-        // Configure Monaco loader
-        require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs' } });
-
-        // Initialize Monaco Editor with Alescript language
-        require(['vs/editor/editor.main'], function() {
-            // Register Alescript language
-            monaco.languages.register({ id: 'alescript' });
-
-            // Define Monarch syntax highlighting for Alescript
-            monaco.languages.setMonarchTokensProvider('alescript', {
-                keywords: [
-                    'recipe', 'end', 'brew', 'from', 'wait', 'for', 'relabel', 'as',
-                    'mix', 'with', 'repeat', 'times', 'each', 'in', 'toast', 'taste',
-                    'age', 'until', 'keg', 'judge', 'if', 'is', 'than', 'else',
-                    'barrel', 'stronger', 'weaker', 'day', 'days', 'water', 'barley',
-                    'hops', 'yeast'
-                ],
-
-                operators: [
-                    '=', '>', '<', '+', '-', '*', '/'
-                ],
-
-                symbols: /[=><!~?:&|+\-*\/\^%]+/,
-
-                tokenizer: {
-                    root: [
-                        // Keywords
-                        [/[a-z_$][\w$]*/, {
-                            cases: {
-                                '@keywords': 'keyword',
-                                '@default': 'identifier'
-                            }
-                        }],
-
-                        // Whitespace
-                        { include: '@whitespace' },
-
-                        // Numbers
-                        [/\d*\.\d+([eE][\-+]?\d+)?/, 'number.float'],
-                        [/\d+/, 'number'],
-
-                        // Strings
-                        [/"([^"\\]|\\.)*$/, 'string.invalid'],
-                        [/"/, 'string', '@string'],
-
-                        // Delimiters and operators
-                        [/[{}()\[\]]/, '@brackets'],
-                        [/[<>](?!@symbols)/, '@brackets'],
-                        [/@symbols/, {
-                            cases: {
-                                '@operators': 'operator',
-                                '@default': ''
-                            }
-                        }],
-
-                        // Delimiter: .
-                        [/[;,.]/, 'delimiter'],
-                    ],
-
-                    whitespace: [
-                        [/[ \t\r\n]+/, 'white'],
-                        [/\/\/.*$/, 'comment'],
-                    ],
-
-                    string: [
-                        [/[^\\"]+/, 'string'],
-                        [/\\./, 'string.escape'],
-                        [/"/, 'string', '@pop']
-                    ],
-                }
-            });
-
-            // Define color theme for Alescript
-            monaco.editor.defineTheme('alescript-dark', {
-                base: 'vs-dark',
-                inherit: true,
-                rules: [
-                    { token: 'keyword', foreground: 'C586C0', fontStyle: 'bold' },
-                    { token: 'identifier', foreground: '9CDCFE' },
-                    { token: 'number', foreground: 'B5CEA8' },
-                    { token: 'string', foreground: 'CE9178' },
-                    { token: 'comment', foreground: '6A9955', fontStyle: 'italic' },
-                    { token: 'operator', foreground: 'D4D4D4' },
-                ],
-                colors: {
-                    'editor.background': '#1e1e1e',
-                }
-            });
-
-            // Create Monaco Editor
-            editor = monaco.editor.create(document.getElementById('editor-container'), {
-                value: examples.hello,
-                language: 'alescript',
-                theme: 'alescript-dark',
-                automaticLayout: true,
-                fontSize: 14,
-                minimap: { enabled: true },
-                scrollBeyondLastLine: false,
-                lineNumbers: 'on',
-                renderWhitespace: 'selection',
-                tabSize: 4,
-                insertSpaces: true,
-            });
-
-            // Add keyboard shortcut for running code (Ctrl+Enter or Cmd+Enter)
-            editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, runCode);
-
-            // Update status
-            document.getElementById('status').innerHTML = '✓ Monaco Editor loaded';
-
-            // Initialize WebAssembly
-            initWasm();
-        });
-
-        // Load WebAssembly module
-        async function initWasm() {
-            try {
-                const { default: init, run_alescript } = await import('./pkg/alescript.js');
-                await init('./pkg/alescript_bg.wasm?v=' + Date.now());
-                wasmModule = { run_alescript };
-                document.getElementById('output').innerHTML = '<span class="success">✓ Ready! Enter your code and press Run or Ctrl+Enter.</span>';
-                document.getElementById('status').innerHTML = '✓ Ready';
-            } catch (error) {
-                document.getElementById('output').innerHTML = `<span class="error">Error loading WebAssembly module:\n${error.message}\n\nMake sure to build the project first with:\nwasm-pack build --target web --out-dir web/pkg</span>`;
-                document.getElementById('status').innerHTML = '✗ Error loading WebAssembly';
-            }
-        }
-
-        // Run code
-        function runCode() {
-            if (!wasmModule) {
-                document.getElementById('output').innerHTML = '<span class="error">WebAssembly module not loaded yet. Please wait...</span>';
-                return;
-            }
-
-            if (!editor) {
-                document.getElementById('output').innerHTML = '<span class="error">Editor not initialized yet. Please wait...</span>';
-                return;
-            }
-
-            const code = editor.getValue();
-            const outputDiv = document.getElementById('output');
-
-            outputDiv.innerHTML = '<span class="loading">Running...</span>';
-            document.getElementById('status').innerHTML = '⏳ Running...';
-
-            // Use setTimeout to allow UI to update
-            setTimeout(() => {
-                try {
-                    const result = wasmModule.run_alescript(code);
-                    outputDiv.textContent = result || '(no output)';
-                    outputDiv.className = '';
-                    document.getElementById('status').innerHTML = '✓ Execution completed';
-                } catch (error) {
-                    outputDiv.innerHTML = `<span class="error">Error:\n${error.message}</span>`;
-                    document.getElementById('status').innerHTML = '✗ Execution failed';
-                }
-            }, 10);
-        }
-
-        // Event listeners
-        document.getElementById('runButton').addEventListener('click', runCode);
-
-        document.getElementById('examples').addEventListener('change', (e) => {
-            const example = e.target.value;
-            if (example && examples[example] && editor) {
-                editor.setValue(examples[example]);
-            }
-        });
-    </script>
+    <footer>
+        <div class="container">
+            <p>Made with 🍺 by the alescript community</p>
+        </div>
+    </footer>
 </body>
 </html>
