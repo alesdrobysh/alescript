@@ -1,9 +1,39 @@
 use std::collections::HashMap;
 
+/// ABV (Alcohol By Volume) value constrained to 0-100%
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Abv(f64);
+
+impl Abv {
+    pub fn new(value: f64) -> Self {
+        Abv(value.clamp(0.0, 100.0))
+    }
+
+    pub fn zero() -> Self {
+        Abv(0.0)
+    }
+
+    pub fn get(&self) -> f64 {
+        self.0
+    }
+
+    pub fn add(self, other: Abv) -> Self {
+        Abv((self.0 + other.0).clamp(0.0, 100.0))
+    }
+
+    pub fn multiply(self, factor: f64) -> Self {
+        Abv((self.0 * factor).clamp(0.0, 100.0))
+    }
+
+    pub fn divide(self, factor: f64) -> Self {
+        Abv((self.0 / factor).clamp(0.0, 100.0))
+    }
+}
+
 /// Represents the state of a single brew
 #[derive(Debug, Clone)]
 pub struct BrewState {
-    pub current_abv: f64,
+    pub current_abv: Abv,
     pub growth_rate: f64,
     pub is_kegged: bool,
     pub last_update_time: f64,
@@ -12,7 +42,7 @@ pub struct BrewState {
 impl BrewState {
     pub fn new(growth_rate: f64, current_time: f64) -> Self {
         BrewState {
-            current_abv: 0.0,
+            current_abv: Abv::zero(),
             growth_rate,
             is_kegged: false,
             last_update_time: current_time,
@@ -22,7 +52,8 @@ impl BrewState {
     pub fn update_to_time(&mut self, current_time: f64) {
         if !self.is_kegged {
             let time_delta = current_time - self.last_update_time;
-            self.current_abv += self.growth_rate * time_delta;
+            let increase = Abv::new(self.growth_rate * time_delta);
+            self.current_abv = self.current_abv.add(increase);
             self.last_update_time = current_time;
         }
     }
@@ -44,7 +75,6 @@ impl Value {
             _ => Err(format!("Expected number, got {:?}", self)),
         }
     }
-
 }
 
 /// Runtime environment managing all state
@@ -94,7 +124,7 @@ impl RuntimeEnvironment {
     pub fn get_brew_abv(&mut self, name: &str) -> Result<f64, String> {
         if let Some(brew) = self.brews.get_mut(name) {
             brew.update_to_time(self.global_time);
-            Ok(brew.current_abv)
+            Ok(brew.current_abv.get())
         } else {
             Err(format!("Brew '{}' not found", name))
         }
@@ -122,7 +152,7 @@ impl RuntimeEnvironment {
             }
 
             // If already at or above target, nothing to do
-            if brew.current_abv >= target_abv {
+            if brew.current_abv.get() >= target_abv {
                 return Ok(());
             }
 
@@ -134,7 +164,7 @@ impl RuntimeEnvironment {
             }
 
             // Calculate time needed
-            let time_needed = (target_abv - brew.current_abv) / brew.growth_rate;
+            let time_needed = (target_abv - brew.current_abv.get()) / brew.growth_rate;
 
             // Advance time for all brews
             self.advance_time(time_needed)?;
@@ -151,7 +181,7 @@ impl RuntimeEnvironment {
         let source_abv = self.get_brew_abv(source)?;
 
         if let Some(target_brew) = self.brews.get_mut(target) {
-            target_brew.current_abv = target_abv + source_abv;
+            target_brew.current_abv = Abv::new(target_abv).add(Abv::new(source_abv));
             Ok(())
         } else {
             Err(format!("Brew '{}' not found", target))
@@ -166,9 +196,9 @@ impl RuntimeEnvironment {
         let current_abv = self.get_brew_abv(name)?;
 
         if let Some(brew) = self.brews.get_mut(name) {
-            let target_abv = current_abv * factor;
+            let target_abv = Abv::new(current_abv).multiply(factor);
             let time_needed = if brew.growth_rate > 0.0 {
-                (target_abv - current_abv) / brew.growth_rate
+                (target_abv.get() - current_abv) / brew.growth_rate
             } else {
                 // If no growth rate, we can't fortify by waiting
                 0.0
@@ -178,7 +208,6 @@ impl RuntimeEnvironment {
             if time_needed > 0.0 {
                 self.advance_time(time_needed)?;
             } else {
-                // Just set the value directly
                 brew.current_abv = target_abv;
             }
             Ok(())
@@ -192,7 +221,7 @@ impl RuntimeEnvironment {
         let current_abv = self.get_brew_abv(name)?;
 
         if let Some(brew) = self.brews.get_mut(name) {
-            brew.current_abv = current_abv / factor;
+            brew.current_abv = Abv::new(current_abv).divide(factor);
             Ok(())
         } else {
             Err(format!("Brew '{}' not found", name))
