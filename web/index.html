@@ -350,7 +350,7 @@
 
         .hero .cta-buttons {
             display: flex;
-            gap: 16px;
+            gap: 24px;
             justify-content: center;
             flex-wrap: wrap;
         }
@@ -519,6 +519,7 @@
             font-size: 0.75rem;
             color: rgba(240, 230, 211, 0.7);
             overflow-x: auto;
+            white-space: pre;
         }
 
         /* Operators Table */
@@ -584,6 +585,10 @@
             font-size: 0.875rem;
         }
 
+        .operators-table-wrap {
+            overflow-x: auto;
+        }
+
         .operators-table code {
             background: var(--bg-code);
             padding: 6px 12px;
@@ -591,10 +596,12 @@
             font-family: monospace;
             font-size: 0.75rem;
             color: rgba(240, 230, 211, 0.7);
+            white-space: nowrap;
         }
 
         @media (max-width: 768px) {
-            .operators-table .desc {
+            .operators-table .desc,
+            .operators-table .desc-header {
                 display: none;
             }
         }
@@ -688,8 +695,14 @@
 
         .philosophy-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 32px;
+        }
+
+        @media (max-width: 768px) {
+            .philosophy-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .philosophy-item {
@@ -755,6 +768,13 @@
             margin-bottom: 20px;
         }
 
+        .cta-section .cta-buttons {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
         .cta-section p {
             color: var(--text-secondary);
             font-size: 1.2rem;
@@ -807,6 +827,7 @@
 
         .terminal-body {
             padding: 24px;
+            overflow-x: auto;
         }
 
         .terminal-body pre {
@@ -814,6 +835,7 @@
             font-size: 1rem;
             line-height: 1.8;
             color: var(--text-primary);
+            white-space: pre;
         }
 
         .terminal-body .prompt {
@@ -1050,13 +1072,14 @@
             <h2>Beer Arithmetic</h2>
             <p>There is no subtraction in alescript. Seriously, how would that even work?</p>
 
+            <div class="operators-table-wrap">
             <table class="operators-table">
                 <caption class="sr-only">Beer arithmetic operators</caption>
                 <thead>
                     <tr>
                         <th>OP</th>
                         <th>METAPHOR</th>
-                        <th>DESCRIPTION</th>
+                        <th class="desc-header">DESCRIPTION</th>
                         <th>EXAMPLE</th>
                     </tr>
                 </thead>
@@ -1081,6 +1104,7 @@
                     </tr>
                 </tbody>
             </table>
+            </div>
         </div>
     </section>
 
@@ -1131,7 +1155,7 @@
     <div class="section-divider" aria-hidden="true"></div>
     <section class="quickstart-section">
         <div class="container">
-            <p class="section-label"># Quick start</p>
+            <p class="section-label">Quick start</p>
 
             <div class="terminal">
                 <div class="terminal-header">
